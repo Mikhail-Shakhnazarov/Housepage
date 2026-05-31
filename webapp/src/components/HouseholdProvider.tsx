@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 interface Household {
     id: string;
@@ -23,6 +24,7 @@ export const HouseholdProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const [activeHousehold, setActiveHousehold] = useState<Household | null>(null);
     const [households, setHouseholds] = useState<Household[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const router = useRouter();
 
     useEffect(() => {
         if (status === 'authenticated') {
@@ -31,6 +33,9 @@ export const HouseholdProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                 .then(res => res.json())
                 .then(data => {
                     setHouseholds(data);
+                    if (data.length === 0 && window.location.pathname !== '/onboarding') {
+                        router.push('/onboarding');
+                    }
                     // Auto-select first if none selected
                     const savedId = localStorage.getItem('active_household_id');
                     const selected = data.find((h: Household) => h.id === savedId) || data[0];
@@ -43,7 +48,7 @@ export const HouseholdProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         } else if (status === 'unauthenticated') {
             setIsLoading(false);
         }
-    }, [status]);
+    }, [status, router]);
 
     const selectHousehold = (id: string) => {
         const selected = households.find(h => h.id === id);
