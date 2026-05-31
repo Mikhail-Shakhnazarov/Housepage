@@ -1,0 +1,12 @@
+/run/media/mikhails/data/from_ubuntu/GITHUB/earmark_private_corpus/house/project/experimental/web/Housepage/backend-rs/target/debug/deps/serde-a68bd22d230375d3.d: /home/mikhails/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/mikhails/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/mikhails/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/mikhails/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/mikhails/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /run/media/mikhails/data/from_ubuntu/GITHUB/earmark_private_corpus/house/project/experimental/web/Housepage/backend-rs/target/debug/build/serde-830168119362d6eb/out/private.rs
+
+/run/media/mikhails/data/from_ubuntu/GITHUB/earmark_private_corpus/house/project/experimental/web/Housepage/backend-rs/target/debug/deps/libserde-a68bd22d230375d3.rmeta: /home/mikhails/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/mikhails/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/mikhails/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/mikhails/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/mikhails/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /run/media/mikhails/data/from_ubuntu/GITHUB/earmark_private_corpus/house/project/experimental/web/Housepage/backend-rs/target/debug/build/serde-830168119362d6eb/out/private.rs
+
+/home/mikhails/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs:
+/home/mikhails/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs:
+/home/mikhails/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs:
+/home/mikhails/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs:
+/home/mikhails/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs:
+/run/media/mikhails/data/from_ubuntu/GITHUB/earmark_private_corpus/house/project/experimental/web/Housepage/backend-rs/target/debug/build/serde-830168119362d6eb/out/private.rs:
+
+# env-dep:OUT_DIR=/run/media/mikhails/data/from_ubuntu/GITHUB/earmark_private_corpus/house/project/experimental/web/Housepage/backend-rs/target/debug/build/serde-830168119362d6eb/out

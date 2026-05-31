@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    { "id": "t_garbage_take_out", "title": "Take out garbage", "room": "garbage", "effort": 3, "minutes_est": 10, "frequency_days": null, "kind": "clean" },
+    { "id": "t_garbage_clean_bins", "title": "Clean bins", "room": "garbage", "effort": 3, "minutes_est": 10, "frequency_days": null, "kind": "clean" },
+    { "id": "t_garbage_set_new_bags", "title": "Set new bags into bins", "room": "garbage", "effort": 1, "minutes_est": 3, "frequency_days": null, "kind": "restock" },
+    { "id": "t_garbage_take_down_paper_trash", "title": "Take down paper bags / boxes", "room": "garbage", "effort": 3, "minutes_est": 15, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_garbage_take_out_bathroom_garbage", "title": "Take out bathroom garbage", "room": "garbage", "effort": 2, "minutes_est": 5, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_garbage_take_out_bedroom_garbage", "title": "Take out bedroom garbage", "room": "garbage", "effort": 2, "minutes_est": 5, "frequency_days": null, "kind": "tidy" },
+
+    { "id": "t_kitchen_empty_dishwasher", "title": "Empty the dishwasher", "room": "kitchen", "effort": 2, "minutes_est": 7, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_kitchen_run_dishwasher", "title": "Run the dishwasher", "room": "kitchen", "effort": 1, "minutes_est": 2, "frequency_days": null, "kind": "clean" },
+    { "id": "t_kitchen_put_away_dry_plastics", "title": "Put away dry plastic containers", "room": "kitchen", "effort": 2, "minutes_est": 5, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_kitchen_clean_stove", "title": "Clean stovetop", "room": "kitchen", "effort": 3, "minutes_est": 10, "frequency_days": null, "kind": "clean" },
+    { "id": "t_kitchen_clean_sink", "title": "Clean sink", "room": "kitchen", "effort": 2, "minutes_est": 5, "frequency_days": null, "kind": "clean" },
+    { "id": "t_kitchen_put_away_food", "title": "Put away food", "room": "kitchen", "effort": 2, "minutes_est": 5, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_kitchen_throw_away_rotten_food", "title": "Throw away rotten food", "room": "kitchen", "effort": 2, "minutes_est": 7, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_kitchen_clean_food_containers", "title": "Clean food containers", "room": "kitchen", "effort": 2, "minutes_est": 10, "frequency_days": null, "kind": "clean" },
+
+    { "id": "t_cats_clean_toilets", "title": "Clean cat toilets", "room": "cats", "effort": 3, "minutes_est": 10, "frequency_days": 1, "kind": "clean" },
+    { "id": "t_cats_clean_eating_area_new_bowls", "title": "Clean cat eating area and provide new bowls", "room": "cats", "effort": 2, "minutes_est": 5, "frequency_days": null, "kind": "clean" },
+
+    { "id": "t_bathroom_mr_proper_toilet", "title": "Mr. Proper the toilet", "room": "bathroom", "effort": 4, "minutes_est": 15, "frequency_days": null, "kind": "clean" },
+    { "id": "t_bathroom_clean_sink", "title": "Clean sink", "room": "bathroom", "effort": 2, "minutes_est": 7, "frequency_days": null, "kind": "clean" },
+    { "id": "t_bathroom_fetch_clean_towels", "title": "Fetch clean towels", "room": "bathroom", "effort": 2, "minutes_est": 5, "frequency_days": null, "kind": "restock" },
+    { "id": "t_bathroom_clean_drain_of_hair", "title": "Clean drain of hair", "room": "bathroom", "effort": 2, "minutes_est": 5, "frequency_days": null, "kind": "clean" },
+    { "id": "t_bathroom_clean_mirror", "title": "Clean mirror", "room": "bathroom", "effort": 2, "minutes_est": 5, "frequency_days": null, "kind": "clean" },
+    { "id": "t_bathroom_vacuum_and_mop_floor", "title": "Vacuum and mop bathroom floor", "room": "bathroom", "effort": 4, "minutes_est": 20, "frequency_days": null, "kind": "clean" },
+
+    { "id": "t_bedroom_make_floor_walkable", "title": "Make floor walkable", "room": "bedroom", "effort": 4, "minutes_est": 20, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_bedroom_change_bedding", "title": "Change bedding", "room": "bedroom", "effort": 3, "minutes_est": 20, "frequency_days": null, "kind": "clean" },
+    { "id": "t_bedroom_tidy_desk", "title": "Tidy desk", "room": "bedroom", "effort": 3, "minutes_est": 15, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_bedroom_clear_chair", "title": "Clear chair", "room": "bedroom", "effort": 2, "minutes_est": 5, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_bedroom_tidy_bed_shelf", "title": "Tidy up bed shelf", "room": "bedroom", "effort": 2, "minutes_est": 10, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_bedroom_clean_under_bed", "title": "Clean under bed", "room": "bedroom", "effort": 3, "minutes_est": 20, "frequency_days": null, "kind": "clean" },
+
+    { "id": "t_hallway_put_away_shoes", "title": "Put away the shoes", "room": "hallway", "effort": 2, "minutes_est": 5, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_hallway_take_down_garbage", "title": "Take down garbage (hallway)", "room": "hallway", "effort": 3, "minutes_est": 10, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_hallway_take_out_glass_recycling", "title": "Take out glass recycling", "room": "hallway", "effort": 3, "minutes_est": 10, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_hallway_return_packages", "title": "Return packages", "room": "hallway", "effort": 2, "minutes_est": 15, "frequency_days": null, "kind": "admin" },
+
+    { "id": "t_laundry_hang_up_laundry", "title": "Hang up laundry", "room": "laundry", "effort": 2, "minutes_est": 10, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_laundry_bedding_and_towel_laundry", "title": "Bedding and towel laundry", "room": "laundry", "effort": 4, "minutes_est": 20, "frequency_days": null, "kind": "clean" },
+    { "id": "t_laundry_take_down_laundry", "title": "Take down laundry", "room": "laundry", "effort": 2, "minutes_est": 10, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_laundry_fold_by_person", "title": "Fold laundry and organize by person", "room": "laundry", "effort": 3, "minutes_est": 20, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_laundry_put_away_laundry", "title": "Put away laundry", "room": "laundry", "effort": 2, "minutes_est": 10, "frequency_days": null, "kind": "tidy" },
+
+    { "id": "t_supermarket_take_pfand", "title": "Take pfand to the store", "room": "supermarket", "effort": 2, "minutes_est": 15, "frequency_days": null, "kind": "errand" },
+
+    { "id": "t_shopping_add_cat_food", "title": "Add cat food to shopping list", "room": "shopping", "effort": 1, "minutes_est": 2, "frequency_days": null, "kind": "admin" },
+    { "id": "t_shopping_add_cat_litter", "title": "Add cat litter to shopping list", "room": "shopping", "effort": 1, "minutes_est": 2, "frequency_days": null, "kind": "admin" },
+    { "id": "t_shopping_add_cat_snacks", "title": "Add cat snacks to shopping list", "room": "shopping", "effort": 1, "minutes_est": 2, "frequency_days": null, "kind": "admin" },
+
+    { "id": "t_living_put_things_away", "title": "Put things away", "room": "living_room", "effort": 2, "minutes_est": 10, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_living_clean_sofa_and_cracks", "title": "Clean sofa and cracks", "room": "living_room", "effort": 3, "minutes_est": 15, "frequency_days": null, "kind": "clean" },
+    { "id": "t_living_clean_dining_table", "title": "Clean dining table", "room": "living_room", "effort": 2, "minutes_est": 10, "frequency_days": null, "kind": "clean" },
+    { "id": "t_living_surface_tidy", "title": "Surface tidy", "room": "living_room", "effort": 2, "minutes_est": 7, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_living_vacuum", "title": "Vacuum", "room": "living_room", "effort": 3, "minutes_est": 15, "frequency_days": null, "kind": "clean" },
+    { "id": "t_living_vacuum_under_couch", "title": "Vacuum under the couch", "room": "living_room", "effort": 3, "minutes_est": 15, "frequency_days": null, "kind": "clean" },
+    { "id": "t_living_clean_ashtray", "title": "Clean ashtray", "room": "living_room", "effort": 1, "minutes_est": 3, "frequency_days": null, "kind": "clean" }
+  ]
+}

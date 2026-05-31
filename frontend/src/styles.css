@@ -1,0 +1,256 @@
+:root {
+  --bg: #1e1e1e;
+  --panel: #252526;
+  --panel-2: #2d2d30;
+  --text: #d4d4d4;
+  --muted: #9aa0a6;
+  --border: #3c3c3c;
+  --accent: #007acc;
+  --accent-2: #1f9cf0;
+  --danger: #f14c4c;
+  --shadow: rgba(0, 0, 0, 0.35);
+
+  --radius: 10px;
+  --radius-sm: 8px;
+  --pad: 14px;
+  --pad-sm: 10px;
+  --gap: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+    "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+a {
+  color: inherit;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
+  font-size: 0.95em;
+  color: #c5e4ff;
+}
+
+.page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 22px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: 0.2px;
+}
+
+.badge {
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.card {
+  background: linear-gradient(180deg, var(--panel), var(--panel-2));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: 0 10px 24px var(--shadow);
+}
+
+.sectionTitle {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+
+.subtle {
+  opacity: 0.8;
+}
+
+.error {
+  margin: 12px 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(241, 76, 76, 0.6);
+  background: rgba(241, 76, 76, 0.12);
+  color: #ffb6b6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 860px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 10px;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease, transform 60ms ease;
+}
+
+.btn:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnPrimary {
+  border-color: rgba(0, 122, 204, 0.65);
+  background: rgba(0, 122, 204, 0.18);
+}
+
+.btnPrimary:hover {
+  border-color: rgba(31, 156, 240, 0.9);
+  background: rgba(31, 156, 240, 0.22);
+}
+
+.btnGhost {
+  background: transparent;
+}
+
+.btnSelected {
+  border-color: rgba(31, 156, 240, 0.95);
+  box-shadow: 0 0 0 2px rgba(31, 156, 240, 0.2);
+}
+
+.btnDanger {
+  border-color: rgba(241, 76, 76, 0.7);
+  background: rgba(241, 76, 76, 0.12);
+}
+
+.btnDanger:hover {
+  border-color: rgba(241, 76, 76, 0.95);
+  background: rgba(241, 76, 76, 0.18);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.item {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+.pill {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.18);
+  color: var(--text);
+  font-size: 13px;
+}
+
+.form {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+input,
+select {
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  color: var(--text);
+  font: inherit;
+}
+
+select[multiple] {
+  min-height: 140px;
+}
+
+input:focus,
+select:focus,
+.btn:focus {
+  outline: none;
+  border-color: rgba(31, 156, 240, 0.9);
+  box-shadow: 0 0 0 2px rgba(31, 156, 240, 0.22);
+}
+
+.dividerTitle {
+  margin: 18px 0 10px;
+  font-size: 14px;
+  color: var(--muted);
+  letter-spacing: 0.6px;
+}

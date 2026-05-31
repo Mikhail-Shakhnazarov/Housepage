@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "defaults": {
+    "hand_size": 3,
+    "scan_first": true,
+    "time_buckets_min": [5, 10, 20, 45, 90],
+    "energy_scale": "1-5"
+  },
+  "rooms": [
+    { "id": "garbage", "label": "Garbage" },
+    { "id": "kitchen", "label": "Kitchen" },
+    { "id": "cats", "label": "Cats" },
+    { "id": "bathroom", "label": "Bathroom" },
+    { "id": "bedroom", "label": "Bedroom" },
+    { "id": "hallway", "label": "Hallway" },
+    { "id": "laundry", "label": "Laundry" },
+    { "id": "supermarket", "label": "Supermarket" },
+    { "id": "shopping", "label": "Shopping" },
+    { "id": "living_room", "label": "Living room" }
+  ]
+}
