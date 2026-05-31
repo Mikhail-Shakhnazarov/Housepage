@@ -25,6 +25,7 @@
             postgresql_16
             python3
             just
+            tree
             pkg-config
             openssl
             prisma

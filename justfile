@@ -40,3 +40,21 @@ install:
 # Manual cleanup
 clean:
     rm -rf .db/ webapp/.next/ webapp/node_modules/ backend-rs/target/
+
+# Orchestration (Hut Simulator)
+housepage_inventory:
+	@echo "Running Housepage Repository Inventory"
+	@tree -L 2
+
+housepage_baseline:
+	@echo "Running Baseline Checks"
+	@just install
+	@cd webapp && npm run lint || true
+
+housepage_packet packet_name:
+	@echo "Executing Packet: {{packet_name}}"
+	@git checkout -b work/{{packet_name}} 2>/dev/null || git checkout work/{{packet_name}}
+
+housepage_review:
+	@echo "Producing Final Review Summary..."
+	@git status
