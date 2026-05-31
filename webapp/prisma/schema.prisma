@@ -7,7 +7,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // --- Identity & Access ---
@@ -118,7 +117,7 @@ model ExpenseSplit {
 model Note {
   id          String    @id @default(cuid())
   title       String
-  content     Text
+  content     String
   category    String    // e.g. "Access", "Utilities", "Norms"
   
   household   Household @relation(fields: [householdId], references: [id])
