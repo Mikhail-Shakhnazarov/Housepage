@@ -1,31 +1,31 @@
-import { auth } from "@/auth";
+import { requireUser, handleAuthError } from "@/lib/household-auth";
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-    const session = await auth();
+    try {
+        const user = await requireUser();
 
-    if (!session?.user?.id) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const memberships = await prisma.membership.findMany({
-        where: { userId: session.user.id },
-        include: {
-            household: {
-                select: {
-                    id: true,
-                    name: true,
+        const memberships = await prisma.membership.findMany({
+            where: { userId: user.id! },
+            include: {
+                household: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
                 }
             }
-        }
-    });
+        });
 
-    const households = memberships.map((m: any) => ({
-        id: m.household.id,
-        name: m.household.name,
-        role: m.role,
-    }));
+        const households = memberships.map((m: any) => ({
+            id: m.household.id,
+            name: m.household.name,
+            role: m.role,
+        }));
 
-    return NextResponse.json(households);
+        return NextResponse.json(households);
+    } catch (error) {
+        return handleAuthError(error);
+    }
 }
