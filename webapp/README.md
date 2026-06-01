@@ -66,27 +66,22 @@ npm run seed
 npm run db:seed:scan
 # Expected output:
 #   === Scan Sample Seed ===
-#   Read 10 rooms, 120 tasks, 42 checks, 73 events
+#   Read 10 rooms, 49 tasks, 56 checks, 35 events
 #   User: alice@wg.local
 #   Household: Sonnenallee 42 (seed-sonnenallee-42)
 #   Rooms: 10 upserted
-#   Tasks: 120 upserted
-#   Checks: 42 upserted
-#   Check-task links: 87 upserted
-#   Historical events imported:
-#     Scan sessions: N
-#     Scan answers:  M
-#     Deals:         K
-#     Task actions:  J
+#   Tasks: 49 upserted
+#   Checks: 56 upserted
+#   Check-task links: 65 upserted
 #   === Seed complete ===
 
 # 6. Validate seeded scan data
 npm run db:validate:scan
 # Expected output:
 #   rooms: 10
-#   checks: 42
-#   tasks: 120
-#   check-task links: 87
+#   checks: 56
+#   tasks: 55 (49 + 6 base)
+#   check-task links: 65
 #   scan data ok
 
 # 7. Start dev server
@@ -121,11 +116,15 @@ No password required. Auth is email-only for development.
 | `npm run smoke:scan` | Alias for `smoke` |
 | `npm run smoke:access` | Household scoping and role enforcement smoke test |
 | `npm run smoke:webapp` | Notes, expenses, decisions smoke test |
+| `npm run smoke:http` | HTTP-level validation (requires dev server) |
 | `npm run seed` | Seed base data (users, household, tasks, expenses, notes, decisions) |
 | `npm run db:generate` | Generate Prisma client |
 | `npm run db:migrate` | Run Prisma migrations in dev mode |
+| `npm run db:deploy` | Apply migrations in CI/production |
 | `npm run db:seed:scan` | Seed scan ontology from local sample vault |
 | `npm run db:validate:scan` | Validate scan data integrity for seed household |
+| `npm run test` | Run unit tests (deal scoring, validation helpers) |
+| `npm run test:watch` | Run unit tests in watch mode |
 
 ## Development auth
 
@@ -164,19 +163,18 @@ npx prisma studio
 | `Can't reach database server` | Postgres not running or `DATABASE_URL` is wrong |
 | `Relation "public.User" does not exist` | Migrations not applied — run `npx prisma migrate dev` |
 | `Invalid prisma.user.upsert()` | Environment variables not loaded — ensure `.env` exists |
-| `npm run lint` reports style warnings | Non-blocking; being addressed incrementally |
+| `npm run lint` reports warnings | Fix unused variables or run `npm run lint -- --fix` |
 
 ## Known limitations
 
 - Auth is email-only with no password. Not suitable for production.
-- No E2E browser tests. The app is exercised through direct Prisma smoke scripts.
+- No E2E browser tests. The app is exercised through Prisma smoke scripts and unit tests.
 - No deployment to any staging or production environment. See `docs/deployment/webapp.md`.
-- Lint reports non-blocking style warnings from the Tailwind v4 migration.
 - The webapp and local-vault baseline have parallel scan ontologies with no sync bridge yet.
 
 ## Status
 
 - Auth: Development-only credentials provider
 - Deployment: Not yet deployed outside localhost
-- CI: Postgres-backed build, migration, seed, validation, and smoke tests run in CI
-- Tests: Smoke scripts cover critical paths (scan, deal, action, access control, notes, expenses, decisions)
+- CI: Postgres-backed build, migration, seed, validation, smoke tests, lint (blocking), and unit tests run in CI
+- Tests: Smoke scripts cover scan/deal/action, access control, notes/expenses/decisions. Unit tests cover deal scoring. HTTP smoke validates route input rejection without auth.

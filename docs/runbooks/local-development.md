@@ -66,6 +66,7 @@ npm run seed
 npm run db:seed:scan
 npm run db:validate:scan
 npm run lint
+npm run test
 npm run build
 npm run smoke
 npm run smoke:access
@@ -92,20 +93,20 @@ After scan seed:
 
 ```
 === Scan Sample Seed ===
-Read 10 rooms, 120 tasks, 42 checks, 73 events
+Read 10 rooms, 49 tasks, 56 checks, 35 events
 Rooms: 10 upserted
-Tasks: 120 upserted
-Checks: 42 upserted
-Check-task links: 87 upserted
+Tasks: 49 upserted
+Checks: 56 upserted
+Check-task links: 65 upserted
 ```
 
 After validation:
 
 ```
 rooms: 10
-checks: 42
-tasks: 120
-check-task links: 87
+checks: 56
+tasks: 55 (49 + 6 base seed)
+check-task links: 65
 scan data ok
 ```
 
@@ -168,6 +169,7 @@ npm run seed
 npm run db:seed:scan
 npm run db:validate:scan
 npm run lint
+npm run test
 npm run build
 npm run smoke
 npm run smoke:access
