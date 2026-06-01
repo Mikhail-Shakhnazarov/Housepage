@@ -21,7 +21,7 @@ export async function GET(req: Request) {
         });
 
         // Map icons based on type
-        const eventsWithIcons = events.map((event: any) => {
+        const eventsWithIcons = events.map((event: { type: string; createdAt: Date; [key: string]: unknown }) => {
             let icon = '📝';
             if (event.type === 'chore') icon = '♻️';
             if (event.type === 'money') icon = '💳';

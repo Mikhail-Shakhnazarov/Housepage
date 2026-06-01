@@ -19,11 +19,11 @@ export async function POST(req: Request) {
                 },
             });
 
-            const membership = await tx.membership.create({
+            await tx.membership.create({
                 data: {
                     userId: user.id!,
                     householdId: household.id,
-                    role: "ADMIN",
+                    role: "OWNER",
                 },
             });
 

@@ -12,31 +12,38 @@ datasource db {
 // --- Identity & Access ---
 
 model User {
-  id            String       @id @default(cuid())
-  email         String       @unique
-  name          String?
-  image         String?
-  memberships   Membership[]
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  id          String       @id @default(cuid())
+  email       String       @unique
+  name        String?
+  image       String?
+  memberships Membership[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Household {
   id          String       @id @default(cuid())
   name        String
-  address     String?      // e.g. "Sonnenallee"
+  address     String? // e.g. "Sonnenallee"
   memberships Membership[]
   invitations Invitation[]
-  
-  // Operational Objects (Scoped)
-  tasks       Task[]
-  expenses    Expense[]
-  notes       Note[]
-  decisions   Decision[]
-  feedEvents  FeedEvent[]
 
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  // Operational Objects (Scoped)
+  tasks      Task[]
+  expenses   Expense[]
+  notes      Note[]
+  decisions  Decision[]
+  feedEvents FeedEvent[]
+
+  // Scan Ontology
+  rooms        Room[]
+  checks       Check[]
+  scanSessions ScanSession[]
+  deals        Deal[]
+  taskActions  TaskAction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Role {
@@ -46,34 +53,54 @@ enum Role {
 }
 
 model Membership {
-  id          String    @id @default(cuid())
-  role        Role      @default(MEMBER)
-  
-  user        User      @relation(fields: [userId], references: [id])
-  userId      String
-  
+  id   String @id @default(cuid())
+  role Role   @default(MEMBER)
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
   household   Household @relation(fields: [householdId], references: [id])
   householdId String
 
-  createdAt   DateTime  @default(now())
+  createdAt DateTime @default(now())
 
   @@unique([userId, householdId])
 }
 
 model Invitation {
-  id          String    @id @default(cuid())
-  email       String
-  token       String    @unique
-  role        Role      @default(MEMBER)
-  
+  id    String @id @default(cuid())
+  email String
+  token String @unique
+  role  Role   @default(MEMBER)
+
   household   Household @relation(fields: [householdId], references: [id])
   householdId String
 
-  expiresAt   DateTime
-  createdAt   DateTime  @default(now())
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 // --- Operational Layers (The Wedge & Anchor) ---
+
+model Room {
+  id          String @id @default(cuid())
+  householdId String
+  name        String
+  slug        String
+  sortOrder   Int    @default(0)
+
+  household    Household     @relation(fields: [householdId], references: [id])
+  tasks        Task[]
+  taskActions  TaskAction[]
+  checks       Check[]
+  scanSessions ScanSession[]
+  deals        Deal[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([householdId, slug])
+}
 
 model Task {
   id          String    @id @default(cuid())
@@ -81,29 +108,171 @@ model Task {
   description String?
   status      String    @default("OPEN") // OPEN, DUE, OVERDUE, DONE, SKIPPED
   dueDate     DateTime?
-  
+
   household   Household @relation(fields: [householdId], references: [id])
   householdId String
-  
-  assigneeId  String?   // User ID
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+
+  assigneeId String? // User ID
+
+  // Scan Ontology fields
+  roomId        String?
+  room          Room?     @relation(fields: [roomId], references: [id])
+  effort        Int?
+  minutesEst    Int?
+  frequencyDays Int?
+  kind          String?
+  sourceKey     String?
+  archivedAt    DateTime?
+
+  // Scan Ontology relations
+  checkLinks CheckTask[]
+  dealLinks  DealTask[]
+  actions    TaskAction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([householdId, sourceKey])
+  @@index([householdId, roomId])
+}
+
+model Check {
+  id          String  @id @default(cuid())
+  householdId String
+  roomId      String
+  prompt      String
+  notes       String?
+  sourceKey   String?
+  active      Boolean @default(true)
+  sortOrder   Int     @default(0)
+
+  household Household    @relation(fields: [householdId], references: [id])
+  room      Room         @relation(fields: [roomId], references: [id])
+  taskLinks CheckTask[]
+  answers   ScanAnswer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([householdId, sourceKey])
+  @@index([householdId, roomId])
+}
+
+model CheckTask {
+  id      String @id @default(cuid())
+  checkId String
+  taskId  String
+
+  check Check @relation(fields: [checkId], references: [id])
+  task  Task  @relation(fields: [taskId], references: [id])
+
+  @@unique([checkId, taskId])
+}
+
+model ScanSession {
+  id          String    @id @default(cuid())
+  householdId String
+  roomId      String
+  userId      String?
+  clientTs    DateTime?
+
+  household Household    @relation(fields: [householdId], references: [id])
+  room      Room         @relation(fields: [roomId], references: [id])
+  answers   ScanAnswer[]
+  deals     Deal[]
+
+  createdAt DateTime @default(now())
+
+  @@index([householdId, roomId])
+  @@index([householdId, createdAt])
+}
+
+model ScanAnswer {
+  id            String @id @default(cuid())
+  scanSessionId String
+  checkId       String
+  answer        String
+
+  scanSession ScanSession @relation(fields: [scanSessionId], references: [id])
+  check       Check       @relation(fields: [checkId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([scanSessionId])
+}
+
+model Deal {
+  id            String  @id @default(cuid())
+  householdId   String
+  roomId        String
+  scanSessionId String?
+  userId        String?
+  energy        Int
+  timeMin       Int
+  handSize      Int
+
+  household   Household    @relation(fields: [householdId], references: [id])
+  room        Room         @relation(fields: [roomId], references: [id])
+  scanSession ScanSession? @relation(fields: [scanSessionId], references: [id])
+  taskLinks   DealTask[]
+  taskActions TaskAction[]
+
+  createdAt DateTime @default(now())
+
+  @@index([householdId, roomId])
+  @@index([householdId, createdAt])
+}
+
+model DealTask {
+  id       String  @id @default(cuid())
+  dealId   String
+  taskId   String
+  position Int
+  score    Float?
+  reason   String?
+
+  deal Deal @relation(fields: [dealId], references: [id])
+  task Task @relation(fields: [taskId], references: [id])
+
+  @@unique([dealId, taskId])
+  @@unique([dealId, position])
+}
+
+model TaskAction {
+  id          String    @id @default(cuid())
+  householdId String
+  taskId      String
+  roomId      String?
+  dealId      String?
+  userId      String?
+  action      String
+  clientTs    DateTime?
+
+  household Household @relation(fields: [householdId], references: [id])
+  task      Task      @relation(fields: [taskId], references: [id])
+  room      Room?     @relation(fields: [roomId], references: [id])
+  deal      Deal?     @relation(fields: [dealId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([householdId, taskId])
+  @@index([householdId, action, createdAt])
+  @@index([householdId, createdAt])
 }
 
 model Expense {
-  id          String    @id @default(cuid())
-  title       String
-  amount      Float
-  currency    String    @default("EUR")
-  payerId     String    // User ID
-  
+  id       String @id @default(cuid())
+  title    String
+  amount   Float
+  currency String @default("EUR")
+  payerId  String // User ID
+
   household   Household @relation(fields: [householdId], references: [id])
   householdId String
-  
-  splits      ExpenseSplit[]
 
-  createdAt   DateTime  @default(now())
+  splits ExpenseSplit[]
+
+  createdAt DateTime @default(now())
 }
 
 model ExpenseSplit {
@@ -115,43 +284,45 @@ model ExpenseSplit {
 }
 
 model Note {
-  id          String    @id @default(cuid())
-  title       String
-  content     String
-  category    String    // e.g. "Access", "Utilities", "Norms"
-  
+  id       String @id @default(cuid())
+  title    String
+  content  String
+  category String // e.g. "Access", "Utilities", "Norms"
+
   household   Household @relation(fields: [householdId], references: [id])
   householdId String
-  
-  pinned      Boolean   @default(false)
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  pinned Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Decision {
-  id          String    @id @default(cuid())
-  title       String
-  context     String?
-  status      String    @default("PROPOSED") // PROPOSED, AGREED, BLOCKED, ARCHIVED
-  
+  id      String  @id @default(cuid())
+  title   String
+  context String?
+  status  String  @default("PROPOSED") // PROPOSED, AGREED, BLOCKED, ARCHIVED
+
   household   Household @relation(fields: [householdId], references: [id])
   householdId String
-  
-  createdBy   String    // User ID
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdBy String // User ID
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model FeedEvent {
-  id          String    @id @default(cuid())
-  type        String    // chore, money, manual, decision
-  action      String
-  userId      String?
-  
+  id     String  @id @default(cuid())
+  type   String // chore, money, manual, decision
+  action String
+  userId String?
+
   household   Household @relation(fields: [householdId], references: [id])
   householdId String
 
-  createdAt   DateTime  @default(now())
+  createdAt DateTime @default(now())
+
+  @@index([householdId, createdAt])
 }

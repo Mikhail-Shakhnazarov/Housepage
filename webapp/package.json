@@ -6,10 +6,24 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "smoke": "tsx scripts/smoke.ts",
+    "smoke:scan": "tsx scripts/smoke.ts",
+    "smoke:access": "tsx scripts/smoke-access.ts",
+    "smoke:webapp": "tsx scripts/smoke-webapp.ts",
+    "smoke:http": "tsx scripts/smoke-http.ts",
+    "seed": "tsx prisma/seed.ts",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:seed:scan": "tsx scripts/seed-scan-sample.ts",
+    "db:validate:scan": "tsx scripts/validate-scan-data.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
+    "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "7.8.0",
     "framer-motion": "^12.40.0",
     "lucide-react": "^1.17.0",
@@ -27,6 +41,8 @@
     "eslint-config-next": "16.2.6",
     "prisma": "7.8.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "^4",
+    "typescript": "^5",
+    "vitest": "^4.1.7"
   }
 }

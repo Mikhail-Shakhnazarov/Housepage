@@ -53,6 +53,13 @@ jobs:
         run: npm run build
         working-directory: frontend
 
+      - name: Rust/Vite summary
+        if: always()
+        run: |
+          echo "## Rust/Vite baseline" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Rust build: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Vite build: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
+
   sample-vault:
     name: Sample vault validation
     runs-on: ubuntu-latest
@@ -117,6 +124,12 @@ jobs:
           assert not missing_check_refs, f"missing check refs: {sorted(missing_check_refs)}"
           print("references ok")
           PY
+
+      - name: Sample vault summary
+        if: always()
+        run: |
+          echo "## Sample vault validation" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Status: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
 
   api-smoke:
     name: Rust API smoke
@@ -237,6 +250,12 @@ jobs:
           print('api smoke ok')
           PY
 
+      - name: Rust API smoke summary
+        if: always()
+        run: |
+          echo "## Rust API smoke" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Scan, deal, action loop: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload backend log on failure
         if: failure()
         uses: actions/upload-artifact@v4
@@ -244,8 +263,8 @@ jobs:
           name: housepage-backend-log
           path: /tmp/housepage-backend.log
 
-  webapp-informational:
-    name: Webapp informational lint
+  webapp-lint:
+    name: Webapp lint
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -264,24 +283,111 @@ jobs:
         run: npm install
         working-directory: webapp
 
-      - name: Run webapp lint as non-blocking evidence
+      - name: Run webapp lint
         id: lint
-        continue-on-error: true
         run: |
           npm run lint 2>&1 | tee ../webapp-lint.log
         working-directory: webapp
 
-      - name: Summarize webapp status
-        if: always()
-        run: |
-          echo "## Webapp informational status" >> "$GITHUB_STEP_SUMMARY"
-          echo "The webapp is classified as a future surface and is not a gate for the Rust/Vite baseline." >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Lint exit status is informational in this workflow." >> "$GITHUB_STEP_SUMMARY"
-
       - name: Upload webapp lint log
-        if: always()
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: webapp-lint-log
           path: webapp-lint.log
+
+  webapp-db-build:
+    name: Webapp DB / build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      DATABASE_URL: postgresql://housepage:housepage@127.0.0.1:5432/housepage_test
+      AUTH_SECRET: ci-test-secret
+      AUTH_URL: http://localhost:3000
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: housepage
+          POSTGRES_PASSWORD: housepage
+          POSTGRES_DB: housepage_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: webapp/package-lock.json
+
+      - name: Install webapp dependencies
+        run: npm install
+        working-directory: webapp
+
+      - name: Create .env
+        run: |
+          echo "DATABASE_URL=postgresql://housepage:housepage@127.0.0.1:5432/housepage_test" > .env
+          echo "AUTH_SECRET=ci-test-secret" >> .env
+          echo "AUTH_URL=http://localhost:3000" >> .env
+        working-directory: webapp
+
+      - name: Generate Prisma client
+        run: npm run db:generate
+        working-directory: webapp
+
+      - name: Run migration
+        run: npm run db:deploy
+        working-directory: webapp
+
+      - name: Seed base data
+        run: npm run seed
+        working-directory: webapp
+
+      - name: Seed scan sample
+        run: npm run db:seed:scan
+        working-directory: webapp
+
+      - name: Validate scan data
+        run: npm run db:validate:scan
+        working-directory: webapp
+
+      - name: Unit tests
+        run: npm run test
+        working-directory: webapp
+
+      - name: Smoke test (scan/deal/action loop)
+        run: npm run smoke
+        working-directory: webapp
+
+      - name: Smoke test (access control)
+        run: npm run smoke:access
+        working-directory: webapp
+
+      - name: Smoke test (webapp - notes, expenses, decisions)
+        run: npm run smoke:webapp
+        working-directory: webapp
+
+      - name: Webapp DB/build summary
+        if: always()
+        run: |
+          echo "## Webapp DB / build" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Install, generate, migrate: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Seed, scan seed, scan validation: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Smoke, access smoke, webapp smoke: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Build: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build webapp
+        run: npm run build
+        working-directory: webapp
