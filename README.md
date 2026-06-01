@@ -60,7 +60,7 @@ This is a **Portfolio Prototype**. It works for the person who built it, but you
 
 - **Backend (Rust/Axum)**: A high-performance service that replays your `events.ndjson` to derive current task scores in sub-milliseconds.
 - **Frontend (React)**: A mobile-friendly, minimal UI designed for use while walking around your house.
-- **Data Contract**: Purely file-based. The backend only appends to the event log; it never overwrites your definitions.
+- **Data Contract**: Purely file-based. History (`events.ndjson`) is append-only. Definitions (`tasks.json`, `checks.json`) support writeback via the Library UI ÔÇö the backend uses SHA-256 hash preconditions and atomic writes (write-to-temp ÔåÆ flush ÔåÆ delete-original ÔåÆ rename) with automatic `.backup-<ts>.json` snapshots to prevent data loss or concurrent-write conflicts.
 
 ---
 
