@@ -8,10 +8,15 @@
     "start": "next start",
     "lint": "eslint",
     "smoke": "npx tsx scripts/smoke.ts",
-    "seed": "npx tsx prisma/seed.ts"
+    "seed": "npx tsx prisma/seed.ts",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:seed:scan": "npx tsx scripts/seed-scan-sample.ts",
+    "db:validate:scan": "npx tsx scripts/validate-scan-data.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
+    "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "7.8.0",
     "framer-motion": "^12.40.0",
     "lucide-react": "^1.17.0",
