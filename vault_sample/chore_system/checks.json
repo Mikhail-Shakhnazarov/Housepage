@@ -1,341 +1,460 @@
 {
-  "schema_version": 1,
   "checks": [
     {
       "id": "c_living_sofa_clean_and_organized",
-      "room": "living_room",
+      "linked_task_ids": [
+        "t_living_put_things_away",
+        "t_living_clean_sofa_and_cracks"
+      ],
       "prompt": "Is the sofa clean and organized?",
-      "linked_task_ids": ["t_living_put_things_away", "t_living_clean_sofa_and_cracks"]
+      "room": "living_room"
     },
     {
       "id": "c_living_dining_table_clean",
-      "room": "living_room",
+      "linked_task_ids": [
+        "t_living_clean_dining_table"
+      ],
       "prompt": "Is the dining table clean?",
-      "linked_task_ids": ["t_living_clean_dining_table"]
+      "room": "living_room"
     },
     {
       "id": "c_living_anything_to_put_away",
-      "room": "living_room",
+      "linked_task_ids": [
+        "t_living_surface_tidy"
+      ],
       "prompt": "Is there anything that needs to be put away?",
-      "linked_task_ids": ["t_living_surface_tidy"]
+      "room": "living_room"
     },
     {
       "id": "c_living_can_vacuum_floor",
-      "room": "living_room",
+      "linked_task_ids": [
+        "t_living_vacuum",
+        "t_living_vacuum_under_couch"
+      ],
       "prompt": "Can I vacuum the floor?",
-      "linked_task_ids": ["t_living_vacuum", "t_living_vacuum_under_couch"]
+      "room": "living_room"
     },
     {
       "id": "c_living_ashtray_full",
-      "room": "living_room",
+      "linked_task_ids": [
+        "t_living_clean_ashtray",
+        "t_garbage_take_out"
+      ],
       "prompt": "Is the ashtray full?",
-      "linked_task_ids": ["t_living_clean_ashtray", "t_garbage_take_out"]
+      "room": "living_room"
     },
     {
       "id": "c_laundry_laundry_in_washing_machine",
-      "room": "laundry",
+      "linked_task_ids": [
+        "t_laundry_hang_up_laundry"
+      ],
       "prompt": "Is there laundry in the washing machine?",
-      "linked_task_ids": ["t_laundry_hang_up_laundry"]
+      "room": "laundry"
     },
     {
       "id": "c_laundry_clean_bedding_and_towels",
-      "room": "laundry",
+      "linked_task_ids": [
+        "t_laundry_bedding_and_towel_laundry"
+      ],
       "prompt": "Do we have a clean set of bedding and towels?",
-      "linked_task_ids": ["t_laundry_bedding_and_towel_laundry"]
+      "room": "laundry"
     },
     {
       "id": "c_laundry_dry_clothes_on_rack",
-      "room": "laundry",
+      "linked_task_ids": [
+        "t_laundry_take_down_laundry",
+        "t_laundry_fold_by_person",
+        "t_laundry_put_away_laundry"
+      ],
       "prompt": "Are there dry clothes on the rack?",
-      "linked_task_ids": ["t_laundry_take_down_laundry", "t_laundry_fold_by_person", "t_laundry_put_away_laundry"]
+      "room": "laundry"
     },
     {
       "id": "c_hallway_shoes_out_of_the_way",
-      "room": "hallway",
+      "linked_task_ids": [
+        "t_hallway_put_away_shoes"
+      ],
       "prompt": "Are all the shoes out of the way?",
-      "linked_task_ids": ["t_hallway_put_away_shoes"]
+      "room": "hallway"
     },
     {
       "id": "c_hallway_garbage_to_take_down",
-      "room": "hallway",
+      "linked_task_ids": [
+        "t_hallway_take_down_garbage"
+      ],
       "prompt": "Is there garbage to take down in the hallway?",
-      "linked_task_ids": ["t_hallway_take_down_garbage"]
+      "room": "hallway"
     },
     {
       "id": "c_hallway_pfand_to_store",
-      "room": "hallway",
+      "linked_task_ids": [
+        "t_supermarket_take_pfand"
+      ],
       "prompt": "Do we have pfand to take to the store?",
-      "linked_task_ids": ["t_supermarket_take_pfand"]
+      "room": "hallway"
     },
     {
       "id": "c_hallway_glass_recycling_to_take_out",
-      "room": "hallway",
+      "linked_task_ids": [
+        "t_hallway_take_out_glass_recycling"
+      ],
       "prompt": "Do we have glass garbage to take out?",
-      "linked_task_ids": ["t_hallway_take_out_glass_recycling"]
+      "room": "hallway"
     },
     {
       "id": "c_hallway_packages_to_return",
-      "room": "hallway",
+      "linked_task_ids": [
+        "t_hallway_return_packages"
+      ],
       "prompt": "Do we have packages to return?",
-      "linked_task_ids": ["t_hallway_return_packages"]
+      "room": "hallway"
     },
     {
       "id": "c_bathroom_toilet_clean_white_clean",
-      "room": "bathroom",
+      "linked_task_ids": [
+        "t_bathroom_mr_proper_toilet"
+      ],
       "prompt": "Is the toilet clean? White clean? Really?",
-      "linked_task_ids": ["t_bathroom_mr_proper_toilet"]
+      "room": "bathroom"
     },
     {
       "id": "c_bathroom_sink_clean",
-      "room": "bathroom",
+      "linked_task_ids": [
+        "t_bathroom_clean_sink"
+      ],
       "prompt": "Is the sink clean?",
-      "linked_task_ids": ["t_bathroom_clean_sink"]
+      "room": "bathroom"
     },
     {
       "id": "c_bathroom_clean_towels",
-      "room": "bathroom",
+      "linked_task_ids": [
+        "t_bathroom_fetch_clean_towels"
+      ],
       "prompt": "Do we have clean towels?",
-      "linked_task_ids": ["t_bathroom_fetch_clean_towels"]
+      "room": "bathroom"
     },
     {
       "id": "c_bathroom_drain_clean_of_hair",
-      "room": "bathroom",
+      "linked_task_ids": [
+        "t_bathroom_clean_drain_of_hair"
+      ],
       "prompt": "Is the drain clean of hair?",
-      "linked_task_ids": ["t_bathroom_clean_drain_of_hair"]
+      "room": "bathroom"
     },
     {
       "id": "c_bathroom_mirror_clean",
-      "room": "bathroom",
+      "linked_task_ids": [
+        "t_bathroom_clean_mirror"
+      ],
       "prompt": "Is the mirror clean?",
-      "linked_task_ids": ["t_bathroom_clean_mirror"]
+      "room": "bathroom"
     },
     {
       "id": "c_bathroom_vacuum_and_mop_floor",
-      "room": "bathroom",
+      "linked_task_ids": [
+        "t_bathroom_vacuum_and_mop_floor"
+      ],
       "prompt": "Can I vacuum and mop the floor?",
-      "linked_task_ids": ["t_bathroom_vacuum_and_mop_floor"]
+      "room": "bathroom"
     },
     {
       "id": "c_cats_bathroom_clean_every_day",
-      "room": "cats",
+      "linked_task_ids": [
+        "t_cats_clean_toilets"
+      ],
       "prompt": "Is their bathroom clean? (every day)",
-      "linked_task_ids": ["t_cats_clean_toilets"]
+      "room": "cats"
     },
     {
       "id": "c_cats_enough_cat_food",
-      "room": "cats",
+      "linked_task_ids": [
+        "t_shopping_add_cat_food"
+      ],
       "prompt": "Do we have enough cat food?",
-      "linked_task_ids": ["t_shopping_add_cat_food"]
+      "room": "cats"
     },
     {
       "id": "c_cats_enough_cat_litter",
-      "room": "cats",
+      "linked_task_ids": [
+        "t_shopping_add_cat_litter"
+      ],
       "prompt": "Do we have enough cat litter?",
-      "linked_task_ids": ["t_shopping_add_cat_litter"]
+      "room": "cats"
     },
     {
       "id": "c_cats_have_cat_snacks",
-      "room": "cats",
+      "linked_task_ids": [
+        "t_shopping_add_cat_snacks"
+      ],
       "prompt": "Do we have cat snacks?",
-      "linked_task_ids": ["t_shopping_add_cat_snacks"]
+      "room": "cats"
     },
     {
       "id": "c_cats_eating_area_clean",
-      "room": "cats",
+      "linked_task_ids": [
+        "t_cats_clean_eating_area_new_bowls"
+      ],
       "prompt": "Is their eating area clean?",
-      "linked_task_ids": ["t_cats_clean_eating_area_new_bowls"]
+      "room": "cats"
     },
     {
       "id": "c_kitchen_dishwasher_empty",
-      "room": "kitchen",
+      "linked_task_ids": [
+        "t_kitchen_empty_dishwasher"
+      ],
       "prompt": "Is the dishwasher empty?",
-      "linked_task_ids": ["t_kitchen_empty_dishwasher"]
+      "room": "kitchen"
     },
     {
       "id": "c_kitchen_dishwasher_needs_run",
-      "room": "kitchen",
+      "linked_task_ids": [
+        "t_kitchen_run_dishwasher"
+      ],
       "prompt": "Does the dishwasher need to be run?",
-      "linked_task_ids": ["t_kitchen_run_dishwasher"]
+      "room": "kitchen"
     },
     {
       "id": "c_kitchen_plastics_dry",
-      "room": "kitchen",
+      "linked_task_ids": [
+        "t_kitchen_put_away_dry_plastics"
+      ],
       "prompt": "Are the plastics dry?",
-      "linked_task_ids": ["t_kitchen_put_away_dry_plastics"]
+      "room": "kitchen"
     },
     {
       "id": "c_kitchen_stovetop_clean",
-      "room": "kitchen",
+      "linked_task_ids": [
+        "t_kitchen_clean_stove"
+      ],
       "prompt": "Is the stovetop clean?",
-      "linked_task_ids": ["t_kitchen_clean_stove"]
+      "room": "kitchen"
     },
     {
       "id": "c_kitchen_sink_clean",
-      "room": "kitchen",
+      "linked_task_ids": [
+        "t_kitchen_clean_sink"
+      ],
       "prompt": "Is the sink clean?",
-      "linked_task_ids": ["t_kitchen_clean_sink"]
+      "room": "kitchen"
     },
     {
       "id": "c_kitchen_food_to_put_away",
-      "room": "kitchen",
+      "linked_task_ids": [
+        "t_kitchen_put_away_food"
+      ],
       "prompt": "Is there food to put away?",
-      "linked_task_ids": ["t_kitchen_put_away_food"]
+      "room": "kitchen"
     },
     {
       "id": "c_kitchen_rotten_food_in_fridge",
-      "room": "kitchen",
+      "linked_task_ids": [
+        "t_kitchen_throw_away_rotten_food",
+        "t_kitchen_clean_food_containers",
+        "t_garbage_take_out"
+      ],
       "prompt": "Is there rotten food in the fridge?",
-      "linked_task_ids": ["t_kitchen_throw_away_rotten_food", "t_kitchen_clean_food_containers", "t_garbage_take_out"]
+      "room": "kitchen"
     },
     {
       "id": "c_garbage_take_out",
-      "room": "garbage",
+      "linked_task_ids": [
+        "t_garbage_take_out",
+        "t_garbage_clean_bins",
+        "t_garbage_set_new_bags"
+      ],
       "prompt": "Is there garbage to take out?",
-      "linked_task_ids": ["t_garbage_take_out", "t_garbage_clean_bins", "t_garbage_set_new_bags"]
+      "room": "garbage"
     },
     {
       "id": "c_garbage_paper_trash",
-      "room": "garbage",
+      "linked_task_ids": [
+        "t_garbage_take_down_paper_trash"
+      ],
       "prompt": "Are there paper bags/boxes to take out?",
-      "linked_task_ids": ["t_garbage_take_down_paper_trash"]
+      "room": "garbage"
     },
     {
       "id": "c_garbage_in_bathroom",
-      "room": "bathroom",
+      "linked_task_ids": [
+        "t_garbage_take_out_bathroom_garbage"
+      ],
       "prompt": "Is there garbage in the bathroom?",
-      "linked_task_ids": ["t_garbage_take_out_bathroom_garbage"]
+      "room": "bathroom"
     },
     {
       "id": "c_garbage_in_bedroom",
-      "room": "bedroom",
+      "linked_task_ids": [
+        "t_garbage_take_out_bedroom_garbage"
+      ],
       "prompt": "Is there garbage in the bedroom?",
-      "linked_task_ids": ["t_garbage_take_out_bedroom_garbage"]
+      "room": "bedroom"
     },
     {
       "id": "c_bedroom_floor_free",
-      "room": "bedroom",
+      "linked_task_ids": [
+        "t_bedroom_make_floor_walkable"
+      ],
       "prompt": "Is the floor free?",
-      "linked_task_ids": ["t_bedroom_make_floor_walkable"]
+      "room": "bedroom"
     },
     {
       "id": "c_bedroom_bed_fresh",
-      "room": "bedroom",
+      "linked_task_ids": [
+        "t_bedroom_change_bedding"
+      ],
       "prompt": "Is the bed fresh / clean?",
-      "linked_task_ids": ["t_bedroom_change_bedding"]
+      "room": "bedroom"
     },
     {
       "id": "c_bedroom_desk_organized",
-      "room": "bedroom",
+      "linked_task_ids": [
+        "t_bedroom_tidy_desk"
+      ],
       "prompt": "Is the desk organized?",
-      "linked_task_ids": ["t_bedroom_tidy_desk"]
+      "room": "bedroom"
     },
     {
       "id": "c_bedroom_chair_free",
-      "room": "bedroom",
+      "linked_task_ids": [
+        "t_bedroom_clear_chair"
+      ],
       "prompt": "Is the chair free?",
-      "linked_task_ids": ["t_bedroom_clear_chair"]
+      "room": "bedroom"
     },
     {
       "id": "c_bedroom_bed_shelf_organized",
-      "room": "bedroom",
+      "linked_task_ids": [
+        "t_bedroom_tidy_bed_shelf"
+      ],
       "prompt": "Is the little shelf behind the bed organized?",
-      "linked_task_ids": ["t_bedroom_tidy_bed_shelf"]
+      "room": "bedroom"
     },
     {
       "id": "c_bedroom_clean_under_bed",
-      "room": "bedroom",
+      "linked_task_ids": [
+        "t_bedroom_clean_under_bed"
+      ],
       "prompt": "Do we need to clean under the bed?",
-      "linked_task_ids": ["t_bedroom_clean_under_bed"]
+      "room": "bedroom"
     },
     {
       "id": "c_bedroom_dry_laundry_on_rack",
-      "room": "bedroom",
+      "linked_task_ids": [
+        "t_laundry_take_down_laundry",
+        "t_laundry_fold_by_person",
+        "t_laundry_put_away_laundry"
+      ],
       "prompt": "Is there dry laundry on the rack?",
-      "linked_task_ids": ["t_laundry_take_down_laundry", "t_laundry_fold_by_person", "t_laundry_put_away_laundry"]
+      "room": "bedroom"
     },
     {
       "id": "c_kitchen_fridge_empty",
-      "room": "kitchen",
+      "linked_task_ids": [
+        "t_kitchen_throw_away_rotten_food"
+      ],
       "prompt": "Is the fridge empty?",
-      "linked_task_ids": ["t_kitchen_throw_away_rotten_food"]
+      "room": "kitchen"
     },
     {
       "id": "c_kitchen_plastic_boxes_put_away",
-      "room": "kitchen",
+      "linked_task_ids": [
+        "t_kitchen_put_away_dry_plastics"
+      ],
       "prompt": "Are the plastic boxes put away?",
-      "linked_task_ids": ["t_kitchen_put_away_dry_plastics"]
+      "room": "kitchen"
     },
     {
       "id": "c_kitchen_stove_clean",
-      "room": "kitchen",
+      "linked_task_ids": [
+        "t_kitchen_clean_stove"
+      ],
       "prompt": "Is the stove clean?",
-      "linked_task_ids": ["t_kitchen_clean_stove"]
+      "room": "kitchen"
     },
     {
       "id": "c_kitchen_countertops_clean",
-      "room": "kitchen",
+      "linked_task_ids": [],
       "prompt": "Are the countertops clean?",
-      "linked_task_ids": []
+      "room": "kitchen"
     },
     {
       "id": "c_kitchen_anything_left_out",
-      "room": "kitchen",
+      "linked_task_ids": [
+        "t_kitchen_put_away_food"
+      ],
       "prompt": "Is there anything left out?",
-      "linked_task_ids": ["t_kitchen_put_away_food"]
+      "room": "kitchen"
     },
     {
       "id": "c_supermarket_cat_food_enough",
-      "room": "supermarket",
+      "linked_task_ids": [
+        "t_shopping_add_cat_food"
+      ],
       "prompt": "Do we have enough cat food?",
-      "linked_task_ids": ["t_shopping_add_cat_food"]
+      "room": "supermarket"
     },
     {
       "id": "c_supermarket_cat_litter_enough",
-      "room": "supermarket",
+      "linked_task_ids": [
+        "t_shopping_add_cat_litter"
+      ],
       "prompt": "Do we have enough cat litter?",
-      "linked_task_ids": ["t_shopping_add_cat_litter"]
+      "room": "supermarket"
     },
     {
       "id": "c_supermarket_check_promos",
-      "room": "supermarket",
+      "linked_task_ids": [],
       "prompt": "Are there promos to check?",
-      "linked_task_ids": []
+      "room": "supermarket"
     },
     {
       "id": "c_garbage_full",
-      "room": "garbage",
+      "linked_task_ids": [
+        "t_garbage_take_out"
+      ],
       "prompt": "Is the garbage full?",
-      "linked_task_ids": ["t_garbage_take_out"]
+      "room": "garbage"
     },
     {
       "id": "c_garbage_clean_bins",
-      "room": "garbage",
+      "linked_task_ids": [
+        "t_garbage_clean_bins"
+      ],
       "prompt": "Do the bins need cleaning?",
-      "linked_task_ids": ["t_garbage_clean_bins"]
+      "room": "garbage"
     },
     {
       "id": "c_garbage_new_bags",
-      "room": "garbage",
+      "linked_task_ids": [
+        "t_garbage_set_new_bags"
+      ],
       "prompt": "Do we need new bags?",
-      "linked_task_ids": ["t_garbage_set_new_bags"]
+      "room": "garbage"
     },
     {
       "id": "c_garbage_paper_boxes",
-      "room": "garbage",
+      "linked_task_ids": [
+        "t_garbage_take_down_paper_trash"
+      ],
       "prompt": "Are there paper boxes to take down?",
-      "linked_task_ids": ["t_garbage_take_down_paper_trash"]
+      "room": "garbage"
     },
     {
       "id": "c_garbage_plastic_to_bring_down",
-      "room": "garbage",
+      "linked_task_ids": [
+        "t_garbage_bring_down_plastic"
+      ],
       "prompt": "Is there plastic to bring down?",
-      "linked_task_ids": ["t_garbage_bring_down_plastic"]
+      "room": "garbage"
     },
     {
       "id": "c_garbage_bedrooms",
-      "room": "garbage",
+      "linked_task_ids": [
+        "t_garbage_take_out_bedroom_garbage"
+      ],
       "prompt": "Is there garbage in the bedrooms?",
-      "linked_task_ids": ["t_garbage_take_out_bedroom_garbage"]
+      "room": "garbage"
     }
-  ]
+  ],
+  "schema_version": 1
 }
