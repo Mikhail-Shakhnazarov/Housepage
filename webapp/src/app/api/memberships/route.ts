@@ -18,7 +18,7 @@ export async function GET() {
             }
         });
 
-        const households = memberships.map((m: any) => ({
+        const households = memberships.map((m: { household: { id: string; name: string }; role: string }) => ({
             id: m.household.id,
             name: m.household.name,
             role: m.role,

@@ -51,8 +51,8 @@ export async function POST(req: Request) {
                 amount,
                 householdId,
                 payerId: payerId || user.id,
-                splits: {
-                    create: members.map((m: any) => ({
+                    splits: {
+                        create: members.map((m: { userId: string }) => ({
                         userId: m.userId,
                         amount: splitAmount,
                     }))

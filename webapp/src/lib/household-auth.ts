@@ -38,13 +38,15 @@ export async function requireHouseholdMember(userId: string, householdId: string
 /**
  * Helper to handle authorization errors in API routes.
  */
-export function handleAuthError(error: any) {
-    if (error.message === "UNAUTHENTICATED") {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export function handleAuthError(error: unknown) {
+    if (error instanceof Error) {
+        if (error.message === "UNAUTHENTICATED") {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+        if (error.message === "UNAUTHORIZED_HOUSEHOLD") {
+            return NextResponse.json({ error: "Forbidden: Not a member of this household" }, { status: 403 });
+        }
+        console.error("Auth helper error:", error.message);
     }
-    if (error.message === "UNAUTHORIZED_HOUSEHOLD") {
-        return NextResponse.json({ error: "Forbidden: Not a member of this household" }, { status: 403 });
-    }
-    console.error("Auth helper error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
 }
