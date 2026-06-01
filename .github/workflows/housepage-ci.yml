@@ -143,10 +143,14 @@ jobs:
           rm -rf /tmp/housepage-ci-vault
           cp -R vault_sample/chore_system /tmp/housepage-ci-vault
 
+      - name: Build Rust backend
+        run: cargo build --release
+        working-directory: backend-rs
+
       - name: Start backend
         run: |
           cd backend-rs
-          CHORE_VAULT_PATH=/tmp/housepage-ci-vault CHORE_PORT=8000 cargo run --release > /tmp/housepage-backend.log 2>&1 &
+          CHORE_VAULT_PATH=/tmp/housepage-ci-vault CHORE_PORT=8000 ./target/release/housepage-rs > /tmp/housepage-backend.log 2>&1 &
           echo $! > /tmp/housepage-backend.pid
 
       - name: Wait for health
