@@ -1,5 +1,7 @@
 # Housepage
 
+[![CI](https://github.com/Mikhail-Shakhnazarov/Housepage/actions/workflows/housepage-ci.yml/badge.svg)](https://github.com/Mikhail-Shakhnazarov/Housepage/actions/workflows/housepage-ci.yml)
+
 Household work either becomes invisible until someone snaps, or it turns into a project-management dashboard that nobody looks at. Housepage is built around a three-step scan-first loop designed to keep a home habitable without making the list the point.
 
 1. **Scan**: Walk into a room, answer a few binary prompts ("Is the sink clear?")
