@@ -123,8 +123,8 @@ export default function Dashboard() {
                                 </div>
                             </div>
                             <div className="flex flex-col justify-center p-6 text-sm opacity-40 italic space-y-4 border-l-2 border-blue-100 dark:border-blue-900 ml-4">
-                                <p>"We should define 'loud' more clearly." — Mikhail</p>
-                                <p>"Agree, but let's allow occasional exceptions with notice." — Katja</p>
+                                <p>&quot;We should define &apos;loud&apos; more clearly.&quot; &mdash; Mikhail</p>
+                                <p>&quot;Agree, but let&apos;s allow occasional exceptions with notice.&quot; &mdash; Katja</p>
                             </div>
                         </div>
                     </section>
@@ -134,6 +134,7 @@ export default function Dashboard() {
             <CreateChoreModal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
+                onSuccess={() => {}}
             />
         </motion.main>
     );
