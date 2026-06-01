@@ -102,6 +102,7 @@ export default function ScanLoop() {
             }
             const data = await res.json();
             dispatch({ type: 'ANSWERS_SUBMITTED', room, scanSessionId: data.scanSessionId });
+            window.dispatchEvent(new CustomEvent('housepage:feed-update'));
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : 'Failed to submit scan answers';
             dispatch({ type: 'ERROR', message: msg });
@@ -130,6 +131,7 @@ export default function ScanLoop() {
             }
             const data = await res.json();
             dispatch({ type: 'DEAL_COMPLETE', tasks: data.tasks, dealId: data.dealId, room });
+            window.dispatchEvent(new CustomEvent('housepage:feed-update'));
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : 'Failed to deal tasks';
             dispatch({ type: 'ERROR', message: msg });
@@ -140,7 +142,6 @@ export default function ScanLoop() {
         if (!activeHousehold) return;
         const p = state.phase;
         if (p.name !== 'hand') return;
-        dispatch({ type: 'ACTION_DONE' });
         const res = await fetch('/api/task/action', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -157,6 +158,8 @@ export default function ScanLoop() {
             const err = await res.json().catch(() => ({ error: 'Action failed' }));
             throw new Error(err.error || 'Action failed');
         }
+        dispatch({ type: 'ACTION_DONE' });
+        window.dispatchEvent(new CustomEvent('housepage:feed-update'));
     }, [activeHousehold, state.phase]);
 
     const handleScanAgain = useCallback(() => {

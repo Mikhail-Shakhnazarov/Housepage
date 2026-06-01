@@ -21,6 +21,14 @@ const HouseFeed: React.FC = () => {
     const [actorNames, setActorNames] = useState<Record<string, string>>({});
     const currentUserId = session?.user?.id;
 
+    const [refreshKey, setRefreshKey] = useState(0);
+
+    useEffect(() => {
+        const handler = () => setRefreshKey(k => k + 1);
+        window.addEventListener('housepage:feed-update', handler);
+        return () => window.removeEventListener('housepage:feed-update', handler);
+    }, []);
+
     useEffect(() => {
         if (!activeHousehold) return;
         fetch(`/api/activity?householdId=${activeHousehold.id}&limit=20`)
@@ -59,7 +67,7 @@ const HouseFeed: React.FC = () => {
                 setActorNames(names);
             })
             .catch(() => setIsLoading(false));
-    }, [activeHousehold, currentUserId]);
+    }, [activeHousehold, currentUserId, refreshKey]);
 
     const getActor = (userId: string | null) => {
         if (!userId) return 'WG';

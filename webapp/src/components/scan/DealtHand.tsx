@@ -26,14 +26,20 @@ export default function DealtHand({
     const [feedback, setFeedback] = useState<{ taskId: string; message: string } | null>(null);
     const [doneTasks, setDoneTasks] = useState<Set<string>>(new Set());
 
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
     const handleAction = async (taskId: string, action: 'done' | 'skip') => {
         setActingTaskId(taskId);
+        setErrorMessage(null);
         try {
             await onAction(taskId, action);
             setDoneTasks(prev => new Set(prev).add(taskId));
             const label = action === 'done' ? 'Done!' : 'Skipped';
             setFeedback({ taskId, message: label });
             setTimeout(() => setFeedback(null), 2000);
+        } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : 'Action failed';
+            setErrorMessage(msg);
         } finally {
             setActingTaskId(null);
         }
@@ -54,6 +60,11 @@ export default function DealtHand({
 
     return (
         <div className="space-y-3">
+            {errorMessage && (
+                <div className="wedge-card border-red-300 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 text-sm p-3 rounded-xl">
+                    {errorMessage}
+                </div>
+            )}
             <AnimatePresence>
                 {tasks.map(task => {
                     const isDone = doneTasks.has(task.taskId);
