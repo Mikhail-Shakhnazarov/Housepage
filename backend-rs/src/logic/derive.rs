@@ -1,7 +1,19 @@
-use chrono::{DateTime, Utc, Duration};
+use chrono::{DateTime, Duration, Utc};
 use serde_json::Value;
 use std::collections::HashSet;
 use std::path::Path;
+
+pub fn parse_event_ts(ts: &str) -> Option<DateTime<Utc>> {
+    // Accept RFC 3339 with or without sub-second precision, with Z or +00:00 offset.
+    if let Ok(dt) = DateTime::parse_from_rfc3339(ts) {
+        return Some(dt.with_timezone(&Utc));
+    }
+    // Fallback: allow naive-ish ISO strings by assuming UTC.
+    if let Ok(dt) = chrono::NaiveDateTime::parse_from_str(ts, "%Y-%m-%dT%H:%M:%S%.f") {
+        return Some(dt.and_utc());
+    }
+    None
+}
 
 pub fn read_events(path: &Path) -> Vec<Value> {
     if !path.exists() {
@@ -26,6 +38,7 @@ pub struct DerivedTaskSignals {
     pub scan_boost: f64,
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn derive_task_signals(
     now: DateTime<Utc>,
     task_id: &str,
@@ -47,7 +60,7 @@ pub fn derive_task_signals(
     for event in events {
         let etype = event.get("type").and_then(|v| v.as_str());
         let ets_raw = event.get("ts").and_then(|v| v.as_str());
-        
+
         let ets = match ets_raw {
             Some(ts) => match ts.parse::<DateTime<Utc>>() {
                 Ok(dt) => dt,
@@ -57,13 +70,13 @@ pub fn derive_task_signals(
         };
 
         match etype {
-            Some("task_done") if event.get("task_id").and_then(|v| v.as_str()) == Some(task_id) => {
-                if last_done_ts.map_or(true, |prev| ets > prev) {
-                    last_done_ts = Some(ets);
-                }
+            Some("task_done") if event.get("task_id").and_then(|v| v.as_str()) == Some(task_id)
+                && last_done_ts.is_none_or(|prev| ets > prev) =>
+            {
+                last_done_ts = Some(ets);
             }
             Some("task_skip") if event.get("task_id").and_then(|v| v.as_str()) == Some(task_id) => {
-                if last_skip_ts.map_or(true, |prev| ets > prev) {
+                if last_skip_ts.is_none_or(|prev| ets > prev) {
                     last_skip_ts = Some(ets);
                 }
                 if ets >= skip_cutoff {
@@ -87,7 +100,7 @@ pub fn derive_task_signals(
                 if ets < scan_cutoff {
                     continue;
                 }
-                
+
                 let age_hours = (now - ets).num_seconds() as f64 / 3600.0;
                 let decay = (1.0 - (age_hours / scan_boost_decay_hours)).max(0.0);
                 scan_boost += decay;
@@ -104,7 +117,11 @@ pub fn derive_task_signals(
     }
 }
 
-pub fn overdue_factor(now: DateTime<Utc>, last_done_ts: Option<DateTime<Utc>>, frequency_days: Option<i32>) -> f64 {
+pub fn overdue_factor(
+    now: DateTime<Utc>,
+    last_done_ts: Option<DateTime<Utc>>,
+    frequency_days: Option<i32>,
+) -> f64 {
     match frequency_days {
         None => 0.0,
         Some(freq) => {

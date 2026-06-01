@@ -1,0 +1,287 @@
+name: Housepage CI
+
+on:
+  push:
+    branches:
+      - master
+      - work/repo-boundary
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: housepage-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rust-vite-baseline:
+    name: Rust/Vite baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: backend-rs
+
+      - name: Build Rust backend
+        run: |
+          cd backend-rs
+          cargo build --release
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Build Vite frontend
+        run: npm run build
+        working-directory: frontend
+
+  sample-vault:
+    name: Sample vault validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate JSON, NDJSON, and references
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("vault_sample/chore_system")
+          for name in ["settings.json", "tasks.json", "checks.json"]:
+              json.loads((root / name).read_text())
+          print("json ok")
+
+          events = root / "events.ndjson"
+          lines = events.read_text().splitlines()
+          assert lines and lines[0].strip(), "events.ndjson starts with blank line"
+          parsed_events = []
+          for i, line in enumerate(lines, 1):
+              if line.strip():
+                  try:
+                      parsed_events.append(json.loads(line))
+                  except Exception as exc:
+                      raise AssertionError(f"invalid NDJSON line {i}: {exc}")
+          print("events ok")
+
+          tasks_obj = json.loads((root / "tasks.json").read_text())
+          checks_obj = json.loads((root / "checks.json").read_text())
+          assert checks_obj.get("schema_version") == 1, "checks.json missing schema_version: 1"
+
+          tasks = {t["id"] for t in tasks_obj["tasks"]}
+          checks = {c["id"] for c in checks_obj["checks"]}
+          missing_task_refs = set()
+          missing_check_refs = set()
+
+          for c in checks_obj["checks"]:
+              for tid in c.get("linked_task_ids", []):
+                  if tid not in tasks:
+                      missing_task_refs.add(tid)
+
+          for e in parsed_events:
+              if e.get("type") == "scan_answer":
+                  cid = e.get("check_id")
+                  if cid and cid not in checks:
+                      missing_check_refs.add(cid)
+              if e.get("type") in {"task_done", "task_skip"}:
+                  tid = e.get("task_id")
+                  if tid and tid not in tasks:
+                      missing_task_refs.add(tid)
+              if e.get("type") == "deal":
+                  for tid in e.get("task_ids", []):
+                      if tid not in tasks:
+                          missing_task_refs.add(tid)
+
+          assert not missing_task_refs, f"missing task refs: {sorted(missing_task_refs)}"
+          assert not missing_check_refs, f"missing check refs: {sorted(missing_check_refs)}"
+          print("references ok")
+          PY
+
+  api-smoke:
+    name: Rust API smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+      - rust-vite-baseline
+      - sample-vault
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: backend-rs
+
+      - name: Prepare isolated vault
+        run: |
+          rm -rf /tmp/housepage-ci-vault
+          cp -R vault_sample/chore_system /tmp/housepage-ci-vault
+
+      - name: Build Rust backend
+        run: cargo build --release
+        working-directory: backend-rs
+
+      - name: Start backend
+        run: |
+          cd backend-rs
+          CHORE_VAULT_PATH=/tmp/housepage-ci-vault CHORE_PORT=8000 ./target/release/housepage-rs > /tmp/housepage-backend.log 2>&1 &
+          echo $! > /tmp/housepage-backend.pid
+
+      - name: Wait for health
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8000/api/health >/tmp/health.json; then
+              cat /tmp/health.json
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "backend failed to become healthy"
+          cat /tmp/housepage-backend.log || true
+          exit 1
+
+      - name: Smoke endpoints and event/writeback behavior
+        run: |
+          set -euo pipefail
+
+          curl -fsS http://127.0.0.1:8000/api/settings | python3 -m json.tool >/tmp/settings.json
+          curl -fsS http://127.0.0.1:8000/api/tasks | python3 -m json.tool >/tmp/tasks.json
+          curl -fsS 'http://127.0.0.1:8000/api/checks?room=living_room' | python3 -m json.tool >/tmp/checks-room.json
+          curl -fsS http://127.0.0.1:8000/api/checks/all | python3 -m json.tool >/tmp/checks-all.json
+          curl -fsS http://127.0.0.1:8000/api/defs/hashes | python3 -m json.tool >/tmp/hashes.json
+          curl -fsS 'http://127.0.0.1:8000/api/metrics?days=14' | python3 -m json.tool >/tmp/metrics-before.json
+
+          curl -fsS -X POST http://127.0.0.1:8000/api/scan/submit \
+            -H 'Content-Type: application/json' \
+            -d '{"room":"living_room","session_id":"ci-session","device_id":"ci-device","client_ts":"2026-06-01T00:00:00Z","answers":[{"check_id":"c_living_sofa_clean_and_organized","answer":"no"}]}' \
+            | python3 -m json.tool
+
+          curl -fsS -X POST http://127.0.0.1:8000/api/deal \
+            -H 'Content-Type: application/json' \
+            -d '{"room":"living_room","energy":3,"time_min":30,"hand_size":3,"session_id":"ci-session","device_id":"ci-device","client_ts":"2026-06-01T00:00:01Z"}' \
+            | python3 -m json.tool >/tmp/deal.json
+
+          TASK_ID=$(python3 - <<'PY'
+          import json
+          data=json.load(open('/tmp/deal.json'))
+          tasks=data.get('tasks', [])
+          assert tasks, 'deal returned no tasks'
+          print(tasks[0]['task_id'])
+          PY
+          )
+
+          curl -fsS -X POST http://127.0.0.1:8000/api/task/action \
+            -H 'Content-Type: application/json' \
+            -d "{\"task_id\":\"$TASK_ID\",\"action\":\"done\",\"room\":\"living_room\",\"session_id\":\"ci-session\",\"device_id\":\"ci-device\",\"client_ts\":\"2026-06-01T00:00:02Z\"}" \
+            | python3 -m json.tool
+
+          TASK_SHA=$(python3 - <<'PY'
+          import json, urllib.request
+          data=json.load(urllib.request.urlopen('http://127.0.0.1:8000/api/defs/hashes'))
+          print(data['tasks_sha256'])
+          PY
+          )
+
+          curl -fsS -X POST http://127.0.0.1:8000/api/tasks/upsert \
+            -H 'Content-Type: application/json' \
+            -d "{\"task\":{\"id\":\"t_ci_tmp\",\"title\":\"CI temporary task\",\"room\":\"living_room\",\"effort\":1,\"minutes_est\":1,\"frequency_days\":null,\"kind\":\"tidy\",\"notes\":null},\"if_match_sha256\":\"$TASK_SHA\"}" \
+            | python3 -m json.tool
+
+          STALE_STATUS=$(curl -s -o /tmp/stale.json -w '%{http_code}' -X POST http://127.0.0.1:8000/api/tasks/upsert \
+            -H 'Content-Type: application/json' \
+            -d "{\"task\":{\"id\":\"t_ci_tmp_2\",\"title\":\"CI stale task\",\"room\":\"living_room\",\"effort\":1,\"minutes_est\":1,\"frequency_days\":null,\"kind\":\"tidy\",\"notes\":null},\"if_match_sha256\":\"$TASK_SHA\"}")
+          test "$STALE_STATUS" = "409"
+          python3 -m json.tool /tmp/stale.json
+
+          curl -fsS 'http://127.0.0.1:8000/api/metrics?days=14' | python3 -m json.tool >/tmp/metrics-after.json
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          events = [json.loads(line) for line in Path('/tmp/housepage-ci-vault/events.ndjson').read_text().splitlines() if line.strip()]
+          types = {e.get('type') for e in events}
+          for required in ['scan_answer', 'deal', 'task_done']:
+              assert required in types, f'missing event type {required}'
+
+          after = json.load(open('/tmp/metrics-after.json'))
+          assert after['scans_total'] >= 1, after
+          assert after['deals_total'] >= 1, after
+          assert after['tasks_done_total'] >= 1, after
+          print('api smoke ok')
+          PY
+
+      - name: Upload backend log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: housepage-backend-log
+          path: /tmp/housepage-backend.log
+
+  webapp-informational:
+    name: Webapp informational lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: webapp/package-lock.json
+
+      - name: Install webapp dependencies
+        run: npm install
+        working-directory: webapp
+
+      - name: Run webapp lint as non-blocking evidence
+        id: lint
+        continue-on-error: true
+        run: |
+          npm run lint 2>&1 | tee ../webapp-lint.log
+        working-directory: webapp
+
+      - name: Summarize webapp status
+        if: always()
+        run: |
+          echo "## Webapp informational status" >> "$GITHUB_STEP_SUMMARY"
+          echo "The webapp is classified as a future surface and is not a gate for the Rust/Vite baseline." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Lint exit status is informational in this workflow." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload webapp lint log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: webapp-lint-log
+          path: webapp-lint.log

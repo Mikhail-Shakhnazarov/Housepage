@@ -21,3 +21,12 @@
 # OS files
 .DS_Store
 Thumbs.db
+
+# Rust build artifacts
+/backend-rs/target/
+
+# Vault backups
+/vault_sample/**/backups/
+
+# tmp
+tmp/

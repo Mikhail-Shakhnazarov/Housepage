@@ -14,6 +14,15 @@ Housepage is built around a specific three-step ritual:
 
 When you finish a task, you mark it **Done**. If you can't face it, you **Skip** it. The system records these signals to improve future deals — no complex ML, just simple rules about what you've been avoiding.
 
+## Repository Surfaces
+
+This repository contains two separate surfaces:
+
+- **Current: Rust/Vite local-vault baseline** — the scan-first chore system described below. Runs on your local network, stores data as JSON files in an Obsidian vault.
+- **Experimental: `webapp/` coordination surface** — a Next.js/Prisma/Postgres project for multi-user WG coordination (Notes, Expenses, Decisions). This is a future/experimental surface and not part of the current baseline.
+
+See [`docs/architecture/housepage-editions.md`](docs/architecture/housepage-editions.md) for the migration strategy between these surfaces.
+
 ## Local-First & Obsidian-First
 
 Housepage doesn't have a database. It runs on your local network and stores everything as plain JSON files in your **Obsidian vault**. 
@@ -60,7 +69,7 @@ This is a **Portfolio Prototype**. It works for the person who built it, but you
 
 - **Backend (Rust/Axum)**: A high-performance service that replays your `events.ndjson` to derive current task scores in sub-milliseconds.
 - **Frontend (React)**: A mobile-friendly, minimal UI designed for use while walking around your house.
-- **Data Contract**: Purely file-based. The backend only appends to the event log; it never overwrites your definitions.
+- **Data Contract**: Purely file-based. History (`events.ndjson`) is append-only. Definitions (`tasks.json`, `checks.json`) support writeback via the Library UI ÔÇö the backend uses SHA-256 hash preconditions and write-to-temp-then-rename with automatic `.backup-<ts>.json` snapshots to prevent data loss or concurrent-write conflicts. On Linux the rename is atomic; on Windows the target file is removed before the rename (best-effort safety, not a cross-platform atomic guarantee).
 
 ---
 

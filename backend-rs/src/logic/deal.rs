@@ -1,6 +1,6 @@
-use std::collections::{HashMap, HashSet};
 use chrono::{DateTime, Utc};
 use serde_json::Value;
+use std::collections::{HashMap, HashSet};
 
 use crate::logic::derive::{derive_task_signals, overdue_factor};
 use crate::models::{Check, DealTaskView, Task};
@@ -44,10 +44,16 @@ impl Default for Tunables {
 
 fn comfort_boost(task: &Task) -> f64 {
     let title = task.title.to_lowercase();
-    if title.contains("garbage") || title.contains("toilet") || title.contains("sink") || title.contains("litter") {
+    if title.contains("garbage")
+        || title.contains("toilet")
+        || title.contains("sink")
+        || title.contains("litter")
+    {
         return 0.5;
     }
-    if (task.room == "garbage" || task.room == "cats") && (task.kind == "clean" || task.kind == "tidy") {
+    if (task.room == "garbage" || task.room == "cats")
+        && (task.kind == "clean" || task.kind == "tidy")
+    {
         return 0.35;
     }
     0.0
@@ -85,7 +91,7 @@ pub fn deal_tasks(
     tunables: Option<Tunables>,
 ) -> Vec<DealTaskView> {
     let t = tunables.unwrap_or_default();
-    
+
     let mut linked_check_ids_by_task: HashMap<String, HashSet<String>> = HashMap::new();
     for check in checks {
         for task_id in &check.linked_task_ids {
@@ -106,8 +112,11 @@ pub fn deal_tasks(
         if exclude_task_ids.contains(&task.id) {
             continue;
         }
-        
-        let linked_checks = linked_check_ids_by_task.get(&task.id).cloned().unwrap_or_default();
+
+        let linked_checks = linked_check_ids_by_task
+            .get(&task.id)
+            .cloned()
+            .unwrap_or_default();
         let signals = derive_task_signals(
             now,
             &task.id,
@@ -129,7 +138,7 @@ pub fn deal_tasks(
         score += t.weight_scan_boost * signals.scan_boost;
         score += comfort_boost(task);
         score -= t.skip_recent_penalty * signals.skip_count_recent as f64;
-        
+
         if task.room == params.room {
             score += t.weight_room_bias;
         }
@@ -179,7 +188,7 @@ pub fn deal_tasks(
             })
             .cloned()
             .collect();
-        
+
         if !filtered.is_empty() {
             let mut others: Vec<DealTaskView> = selected
                 .iter()

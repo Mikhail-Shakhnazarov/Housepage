@@ -141,3 +141,28 @@ pub struct WriteResponse {
     pub ok: bool,
     pub sha256: String,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TaskDeleteRequest {
+    pub task_id: String,
+    pub if_match_sha256: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CheckUpsertRequest {
+    pub check: Check,
+    pub if_match_sha256: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CheckDeleteRequest {
+    pub check_id: String,
+    pub if_match_sha256: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ErrConflictResponse {
+    pub error: String,
+    pub expected_sha256: String,
+    pub current_sha256: String,
+}

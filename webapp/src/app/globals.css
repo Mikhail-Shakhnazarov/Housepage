@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@theme {
+  /* Warm, domestic palette */
+  --color-background: #fdfaf6;
+  /* Soft cream/paper */
+  --color-foreground: #1a1c2c;
+  /* Deep indigo/slate */
+
+  --color-card: #ffffff;
+  --color-card-foreground: #1a1c2c;
+
+  --color-primary: #5c6bc0;
+  /* Indigo */
+  --color-primary-foreground: #ffffff;
+
+  --color-anchor: #f59e0b;
+  /* Soft gold for Manual/Memory */
+  --color-anchor-soft: #fef3c7;
+
+  --color-border: #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #0f172a;
+    --color-foreground: #f8fafc;
+    --color-card: #1e293b;
+    --color-border: #334155;
+  }
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Lovable Utility: Manual Card */
+.manual-card {
+  @apply bg-card border-l-4 border-anchor p-6 rounded-r-xl shadow-sm hover:shadow-md transition-all;
+}
+
+.wedge-card {
+  @apply bg-card p-6 rounded-xl border border-border shadow-sm;
+}
