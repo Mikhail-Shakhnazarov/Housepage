@@ -52,6 +52,30 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000), sign in with any email, create a household, and the dashboard will load.
 
+### Scan Ontology Setup
+
+The webapp's scan ontology (rooms, checks, tasks, deal records) is populated from the local sample vault:
+
+```bash
+# Run migration first (creates scan ontology tables)
+npx prisma migrate dev --name scan_ontology
+
+# Seed scan definitions from vault_sample/chore_system
+npm run db:seed:scan
+
+# Validate seeded data
+npm run db:validate:scan
+```
+
+Expected validation output:
+```
+rooms: 10
+checks: 42
+tasks: 120
+check-task links: 87
+scan data ok
+```
+
 After running `npm run seed`, the following test accounts are available:
 
 | Email | Role |
@@ -70,6 +94,10 @@ After running `npm run seed`, the following test accounts are available:
 | `npm start` | Start production server |
 | `npm run lint` | Run ESLint |
 | `npm run smoke` | Run local smoke test (Prisma connectivity and basic CRUD) |
+| `npm run db:generate` | Generate Prisma client |
+| `npm run db:migrate` | Run Prisma migrations in dev mode |
+| `npm run db:seed:scan` | Seed scan ontology from local sample vault (rooms, tasks, checks, links) |
+| `npm run db:validate:scan` | Validate scan data integrity for the seed household |
 
 ## Development Auth
 
@@ -81,6 +109,7 @@ This is suitable for local development only. Production auth is not implemented.
 
 - **Auth**: Auth.js v5 with Prisma adapter. Session includes `user.id`.
 - **Data model**: Multi-tenant via `Household` and `Membership`. All operational objects (tasks, expenses, notes, decisions, feed events) are scoped to a household.
+- **Scan ontology**: The webapp now stores scan-first objects — rooms, checks, scan sessions, scan answers, deals, deal tasks, and task actions — in Postgres per household. Definitions (rooms, checks, tasks with `sourceKey`) are seeded from the local sample vault.
 - **API**: App Router route handlers with membership checks via `requireHouseholdMember()`.
 - **State**: Client-side `HouseholdProvider` manages active household selection, persisted in localStorage.
 
