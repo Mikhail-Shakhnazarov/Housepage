@@ -285,3 +285,69 @@ jobs:
         with:
           name: webapp-lint-log
           path: webapp-lint.log
+
+  webapp-scan-ontology:
+    name: Webapp scan ontology
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: housepage
+          POSTGRES_PASSWORD: housepage
+          POSTGRES_DB: housepage_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: webapp/package-lock.json
+
+      - name: Install webapp dependencies
+        run: npm install
+        working-directory: webapp
+
+      - name: Create .env
+        run: |
+          echo "DATABASE_URL=postgresql://housepage:housepage@localhost:5432/housepage_test" > .env
+          echo "AUTH_SECRET=ci-test-secret" >> .env
+          echo "AUTH_URL=http://localhost:3000" >> .env
+        working-directory: webapp
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        working-directory: webapp
+
+      - name: Run migration
+        run: npx prisma migrate dev --name scan_ontology
+        working-directory: webapp
+
+      - name: Seed base data
+        run: npm run seed
+        working-directory: webapp
+
+      - name: Seed scan sample
+        run: npm run db:seed:scan
+        working-directory: webapp
+
+      - name: Validate scan data
+        run: npm run db:validate:scan
+        working-directory: webapp
+
+      - name: API smoke test (scan/deal/action loop)
+        run: npm run smoke
+        working-directory: webapp
