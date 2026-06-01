@@ -1,7 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
+import pg from 'pg';
 
-const adapter = new PrismaPg(process.env["DATABASE_URL"]!);
+const pool = new pg.Pool({ connectionString: process.env["DATABASE_URL"]! });
+const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
@@ -50,21 +52,20 @@ async function main() {
 
     // 4. Create tasks in each household
     console.log('4. Creating tasks in each household...');
-    const taskA = await prisma.task.create({
+    await prisma.task.create({
         data: { title: 'Task in HH A', householdId: hhA.id, roomId: roomA.id, effort: 1, minutesEst: 5, status: 'OPEN', sourceKey: 't_access_a' },
     });
-    const taskB = await prisma.task.create({
+    await prisma.task.create({
         data: { title: 'Task in HH B', householdId: hhB.id, roomId: roomB.id, effort: 1, minutesEst: 5, status: 'OPEN', sourceKey: 't_access_b' },
     });
-    console.log(`   Task A in HH A, Task B in HH B\n`);
+    console.log('   Task A in HH A, Task B in HH B\n');
 
     // 5. Verify household scoping: tasks from HH A should not be visible in HH B
     console.log('5. Verifying household scoping...');
     const tasksInA = await prisma.task.findMany({ where: { householdId: hhA.id } });
     const tasksInB = await prisma.task.findMany({ where: { householdId: hhB.id } });
-    const taskIdsInA = new Set(tasksInA.map(t => t.sourceKey));
-    const taskIdsInB = new Set(tasksInB.map(t => t.sourceKey));
-    const leaked = tasksInA.filter(t => taskIdsInB.has(t.sourceKey));
+    const taskKeysInB = new Set(tasksInB.map(t => t.sourceKey));
+    const leaked = tasksInA.filter(t => taskKeysInB.has(t.sourceKey));
     if (leaked.length > 0) {
         throw new Error(`FAIL: tasks leaked between households: ${leaked.map(t => t.sourceKey).join(', ')}`);
     }
@@ -74,7 +75,6 @@ async function main() {
     console.log('6. Verifying room scoping...');
     const roomsInA = await prisma.room.findMany({ where: { householdId: hhA.id } });
     const roomsInB = await prisma.room.findMany({ where: { householdId: hhB.id } });
-    const roomSlugsA = new Set(roomsInA.map(r => r.slug));
     const roomSlugsB = new Set(roomsInB.map(r => r.slug));
     const roomLeak = roomsInA.filter(r => roomSlugsB.has(r.slug));
     if (roomLeak.length > 0) {
