@@ -1,11 +1,4 @@
-import "dotenv/config";
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-import pg from 'pg';
-
-const pool = new pg.Pool({ connectionString: process.env["DATABASE_URL"]! });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+import prisma from "../scripts/lib/prisma";
 
 function daysFromNow(n: number): Date {
     const d = new Date();
@@ -51,6 +44,24 @@ async function main() {
     });
     console.log(`Household: ${household.name}`);
 
+    // Purge all data for this household (reverse FK order so idempotent)
+    const hhId = household.id;
+    await prisma.dealTask.deleteMany({ where: { deal: { householdId: hhId } } });
+    await prisma.taskAction.deleteMany({ where: { householdId: hhId } });
+    await prisma.deal.deleteMany({ where: { householdId: hhId } });
+    await prisma.scanAnswer.deleteMany({ where: { scanSession: { householdId: hhId } } });
+    await prisma.scanSession.deleteMany({ where: { householdId: hhId } });
+    await prisma.checkTask.deleteMany({ where: { check: { householdId: hhId } } });
+    await prisma.check.deleteMany({ where: { householdId: hhId } });
+    await prisma.task.deleteMany({ where: { householdId: hhId } });
+    await prisma.room.deleteMany({ where: { householdId: hhId } });
+    await prisma.feedEvent.deleteMany({ where: { householdId: hhId } });
+    await prisma.expenseSplit.deleteMany({ where: { expense: { householdId: hhId } } });
+    await prisma.expense.deleteMany({ where: { householdId: hhId } });
+    await prisma.note.deleteMany({ where: { householdId: hhId } });
+    await prisma.decision.deleteMany({ where: { householdId: hhId } });
+    console.log("Purged existing data for household");
+
     // ── Memberships ──
     const members = [
         { user: alice, role: "OWNER" as const },
@@ -76,7 +87,6 @@ async function main() {
         { title: "Take out yellow recycling bags", status: "DONE", assigneeId: dave.id, dueDate: daysFromNow(-1) },
         { title: "Clean bathroom — deep scrub", status: "OPEN", assigneeId: null, dueDate: daysFromNow(7) },
     ];
-    await prisma.task.deleteMany({ where: { householdId: household.id } });
     for (const t of taskData) {
         await prisma.task.create({ data: { ...t, householdId: household.id } });
     }
@@ -128,7 +138,6 @@ async function main() {
             ],
         },
     ];
-    await prisma.expense.deleteMany({ where: { householdId: household.id } });
     for (const e of expenseData) {
         const { splits, ...rest } = e;
         await prisma.expense.create({
@@ -168,7 +177,6 @@ async function main() {
             pinned: false,
         },
     ];
-    await prisma.note.deleteMany({ where: { householdId: household.id } });
     for (const n of noteData) {
         await prisma.note.create({ data: { ...n, householdId: household.id } });
     }
@@ -189,7 +197,6 @@ async function main() {
             createdBy: alice.id,
         },
     ];
-    await prisma.decision.deleteMany({ where: { householdId: household.id } });
     for (const d of decisionData) {
         await prisma.decision.create({ data: { ...d, householdId: household.id } });
     }
@@ -205,7 +212,6 @@ async function main() {
         { type: "manual", action: "Dave joined the WG!", userId: dave.id },
         { type: "chore", action: "Dave took out yellow recycling", userId: dave.id },
     ];
-    await prisma.feedEvent.deleteMany({ where: { householdId: household.id } });
     for (const f of feedData) {
         await prisma.feedEvent.create({ data: { ...f, householdId: household.id } });
     }

@@ -301,6 +301,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
+    env:
+      DATABASE_URL: postgresql://housepage:housepage@127.0.0.1:5432/housepage_test
+      AUTH_SECRET: ci-test-secret
+      AUTH_URL: http://localhost:3000
+
     services:
       postgres:
         image: postgres:16
@@ -333,7 +338,7 @@ jobs:
 
       - name: Create .env
         run: |
-          echo "DATABASE_URL=postgresql://housepage:housepage@localhost:5432/housepage_test" > .env
+          echo "DATABASE_URL=postgresql://housepage:housepage@127.0.0.1:5432/housepage_test" > .env
           echo "AUTH_SECRET=ci-test-secret" >> .env
           echo "AUTH_URL=http://localhost:3000" >> .env
         working-directory: webapp
