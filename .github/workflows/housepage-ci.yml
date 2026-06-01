@@ -53,6 +53,13 @@ jobs:
         run: npm run build
         working-directory: frontend
 
+      - name: Rust/Vite summary
+        if: always()
+        run: |
+          echo "## Rust/Vite baseline" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Rust build: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Vite build: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
+
   sample-vault:
     name: Sample vault validation
     runs-on: ubuntu-latest
@@ -117,6 +124,12 @@ jobs:
           assert not missing_check_refs, f"missing check refs: {sorted(missing_check_refs)}"
           print("references ok")
           PY
+
+      - name: Sample vault summary
+        if: always()
+        run: |
+          echo "## Sample vault validation" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Status: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
 
   api-smoke:
     name: Rust API smoke
@@ -237,6 +250,12 @@ jobs:
           print('api smoke ok')
           PY
 
+      - name: Rust API smoke summary
+        if: always()
+        run: |
+          echo "## Rust API smoke" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Scan, deal, action loop: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload backend log on failure
         if: failure()
         uses: actions/upload-artifact@v4
@@ -264,21 +283,14 @@ jobs:
         run: npm install
         working-directory: webapp
 
-      - name: Run webapp lint as non-blocking evidence
+      - name: Run webapp lint
         id: lint
-        continue-on-error: true
         run: |
           npm run lint 2>&1 | tee ../webapp-lint.log
         working-directory: webapp
 
-      - name: Summarize webapp status
-        if: always()
-        run: |
-          echo "## Webapp lint" >> "$GITHUB_STEP_SUMMARY"
-          echo "Lint runs as a non-blocking gate. Full webapp validation with Postgres is in the webapp-db-build job." >> "$GITHUB_STEP_SUMMARY"
-
       - name: Upload webapp lint log
-        if: always()
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: webapp-lint-log
@@ -327,11 +339,11 @@ jobs:
         working-directory: webapp
 
       - name: Generate Prisma client
-        run: npx prisma generate
+        run: npm run db:generate
         working-directory: webapp
 
       - name: Run migration
-        run: npx prisma migrate deploy
+        run: npm run db:deploy
         working-directory: webapp
 
       - name: Seed base data
@@ -346,6 +358,10 @@ jobs:
         run: npm run db:validate:scan
         working-directory: webapp
 
+      - name: Unit tests
+        run: npm run test
+        working-directory: webapp
+
       - name: Smoke test (scan/deal/action loop)
         run: npm run smoke
         working-directory: webapp
@@ -357,6 +373,15 @@ jobs:
       - name: Smoke test (webapp - notes, expenses, decisions)
         run: npm run smoke:webapp
         working-directory: webapp
+
+      - name: Webapp DB/build summary
+        if: always()
+        run: |
+          echo "## Webapp DB / build" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Install, generate, migrate: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Seed, scan seed, scan validation: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Smoke, access smoke, webapp smoke: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Build: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Build webapp
         run: npm run build
