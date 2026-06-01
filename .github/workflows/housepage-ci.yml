@@ -261,7 +261,7 @@ jobs:
           cache-dependency-path: webapp/package-lock.json
 
       - name: Install webapp dependencies
-        run: npm ci
+        run: npm install
         working-directory: webapp
 
       - name: Run webapp lint as non-blocking evidence
