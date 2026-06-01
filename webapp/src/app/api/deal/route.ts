@@ -12,6 +12,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields: householdId, roomId, energy, timeMin, handSize" }, { status: 400 });
     }
 
+    if (!Number.isInteger(energy) || energy < 1 || energy > 5) {
+      return NextResponse.json({ error: "Invalid energy: must be an integer between 1 and 5" }, { status: 400 });
+    }
+
+    if (!Number.isInteger(timeMin) || timeMin < 1 || timeMin > 480) {
+      return NextResponse.json({ error: "Invalid timeMin: must be between 1 and 480" }, { status: 400 });
+    }
+
+    if (!Number.isInteger(handSize) || handSize < 1 || handSize > 20) {
+      return NextResponse.json({ error: "Invalid handSize: must be between 1 and 20" }, { status: 400 });
+    }
+
     await requireHouseholdMember(user.id!, householdId);
 
     const room = await prisma.room.findFirst({

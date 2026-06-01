@@ -3,6 +3,8 @@ import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 
+const ALLOWED_ROLES = ["OWNER", "MEMBER", "SUBLET"];
+
 export async function POST(req: Request) {
     try {
         const user = await requireUser();
@@ -10,6 +12,10 @@ export async function POST(req: Request) {
 
         if (!householdId || !email) {
             return NextResponse.json({ error: "Missing required fields: householdId, email" }, { status: 400 });
+        }
+
+        if (role && !ALLOWED_ROLES.includes(role)) {
+            return NextResponse.json({ error: `Invalid role: ${role}. Allowed: ${ALLOWED_ROLES.join(", ")}` }, { status: 400 });
         }
 
         await requireHouseholdOwner(user.id!, householdId);

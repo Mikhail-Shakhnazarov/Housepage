@@ -2,6 +2,8 @@ import { requireUser, requireHouseholdMember, handleAuthError } from "@/lib/hous
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+const ALLOWED_ANSWERS = ["yes", "no"];
+
 export async function POST(req: Request) {
   try {
     const user = await requireUser();
@@ -9,6 +11,12 @@ export async function POST(req: Request) {
 
     if (!householdId || !roomId || !answers || !Array.isArray(answers) || answers.length === 0) {
       return NextResponse.json({ error: "Missing required fields: householdId, roomId, answers" }, { status: 400 });
+    }
+
+    for (const ans of answers) {
+      if (!ans.checkId || !ALLOWED_ANSWERS.includes(ans.answer)) {
+        return NextResponse.json({ error: `Invalid answer value: "${ans.answer}". Allowed: ${ALLOWED_ANSWERS.join(", ")}` }, { status: 400 });
+      }
     }
 
     await requireHouseholdMember(user.id!, householdId);
