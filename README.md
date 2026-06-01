@@ -1,75 +1,133 @@
-# Housepage: The Scan-First Chore System
+# Housepage
 
-Managing a home usually results in one of two failure modes: either you have an infinite, demoralizing backlog of "todo" items that you never touch, or you spend more time managing the list than actually cleaning your kitchen. 
+Household work either becomes invisible until someone snaps, or it turns into a project-management dashboard that nobody looks at. Housepage is built around a three-step scan-first loop designed to keep a home habitable without making the list the point.
 
-Most chore apps treat your home like a Jira board. **Housepage** treats it like a card game. You don't "manage" a backlog; you scan a room, state your energy level, and get dealt a small "hand" of three tasks. If you can't do them, you skip them. The goal is a calm, low-admin loop that keeps your house habitable without requiring you to become a project manager.
+1. **Scan**: Walk into a room, answer a few binary prompts ("Is the sink clear?")
+2. **Deal**: State your energy level and available time.
+3. **Act**: Get dealt a small hand of tasks. Mark them done or skip them. The system records the signal and moves on.
 
-## The Loop
+## Two surfaces
 
-Housepage is built around a specific three-step ritual:
+This repository contains two separate surfaces under active development:
 
-1.  **Scan**: Walk into a room (e.g., the Kitchen) and answer a few binary prompts. "Is the sink clear?", "Is the floor walkable?". 
-2.  **Deal**: State how much energy you have (1–5) and how much time is available. 
-3.  **Act**: The system deals you **three tasks** that fit your constraints. Tasks linked to "No" answers in your scan get an immediate priority boost.
+**Rust/Vite local-vault baseline** (`backend-rs/` + `frontend/`)
+The scan-first system running on your local network. Stores everything as JSON files in an Obsidian vault. No database, no auth, one user. The authoritative path for the core ritual.
 
-When you finish a task, you mark it **Done**. If you can't face it, you **Skip** it. The system records these signals to improve future deals — no complex ML, just simple rules about what you've been avoiding.
-
-## Repository Surfaces
-
-This repository contains two separate surfaces:
-
-- **Current: Rust/Vite local-vault baseline** — the scan-first chore system described below. Runs on your local network, stores data as JSON files in an Obsidian vault.
-- **Experimental: `webapp/` coordination surface** — a Next.js/Prisma/Postgres project for multi-user WG coordination (Notes, Expenses, Decisions). This is a future/experimental surface and not part of the current baseline.
-
-See [`docs/architecture/housepage-editions.md`](docs/architecture/housepage-editions.md) for the migration strategy between these surfaces.
-
-## Local-First & Obsidian-First
-
-Housepage doesn't have a database. It runs on your local network and stores everything as plain JSON files in your **Obsidian vault**. 
-
-- **Definitions** (Tasks, Checks, Rooms) are plain JSON files you can edit directly in Obsidian or any text editor.
-- **History** is an append-only event log (`events.ndjson`). Your data is never "trapped" in the app; it's just a folder on your drive.
-
-### The Vault Structure
-
-Point the app at a folder in your vault (e.g., `Documents/ChoreSystem/`) and it expects:
-
-```text
-chore_system/
-├── settings.json   # Room definitions and defaults
-├── tasks.json      # The full library of chores
-├── checks.json     # Troubleshooting prompts for your "Scan"
-└── events.ndjson   # The raw history of every scan, deal, and done
+```bash
+export CHORE_VAULT_PATH="$PWD/vault_sample/chore_system"
+make dev
+# opens http://localhost:5173
 ```
 
-## Running the System
+**Webapp coordination workspace** (`webapp/`)
+A Next.js/Prisma/Postgres project for multi-user WG coordination. Adds notes, expenses, decisions, and scan persistence. Designed for groups sharing a flat, not a single-user loop.
 
-Housepage is a mono-repo containing a **Rust (Axum)** backend and a **React (Vite)** frontend. We provide a workspace `Makefile` to handle the plumbing.
+```bash
+cd webapp
+cp .env.example .env
+npm install
+npx prisma generate
+npx prisma migrate dev
+npm run dev
+# opens http://localhost:3000
+```
 
-### Quick Start (Dev)
+See [`docs/architecture/housepage-editions.md`](docs/architecture/housepage-editions.md) for how these two surfaces relate and the staged migration plan.
 
-1.  **Prepare your vault**: Copy the `vault_sample/` directory to your actual Obsidian vault.
-2.  **Launch**:
-    ```bash
-    export CHORE_VAULT_PATH="/path/to/your/vault/chore_system"
-    make dev
-    ```
-3.  **Access**: Open `http://localhost:5173` on your browser (or phone, if on the same Wi-Fi).
+## Data / storage
 
-## Limitations & Project Status
+| Surface | Storage | Format |
+|---------|---------|--------|
+| Local-vault baseline | Obsidian vault folder | JSON definitions + append-only NDJSON event log |
+| Webapp | Postgres | Relational tables via Prisma schema |
 
-This is a **Portfolio Prototype**. It works for the person who built it, but you should be aware of its "rough edges":
+The local-vault surface is intentionally file-based and Obsidian-friendly. You can edit `tasks.json` or `checks.json` in any text editor. History is append-only `events.ndjson`.
 
-- **Single-User**: There is no concept of "users" or "assignees". It assumes one person (or one household sharing a device) is doing the work.
-- **No Authentication**: The API is wide open. Do not expose this to the public internet. Run it only on your trusted home LAN.
-- **Obsidianship**: It leans heavily on the Obsidian ecosystem. While the files are plain JSON, it assumes your primary "admin" interface is an Obsidian folder.
-- **Rust Migration**: We recently verticalized the backend to Rust for performance. The Python implementation remains in `backend/` as a reference, but the Rust service in `backend-rs/` is the authoritative path forward.
+## Quick start
+
+### Local-vault baseline
+
+```bash
+make build-rs        # cargo build --release in backend-rs/
+make build-fe        # npm run build in frontend/
+export CHORE_VAULT_PATH="$PWD/vault_sample/chore_system"
+make dev
+```
+
+Expected output after startup:
+
+```
+Starting Housepage (Rust Backend)...
+listening on 0.0.0.0:8000
+
+VITE v6.2.x  ready in XXXms
+  ➜  Local:   http://localhost:5173/
+```
+
+### Webapp
+
+```bash
+cd webapp
+npm install
+cp .env.example .env
+npx prisma generate
+npx prisma migrate dev
+npm run seed
+npm run db:seed:scan
+npm run db:validate:scan
+npm run dev
+```
+
+Expected output:
+
+```
+rooms: 10
+checks: 42
+tasks: 120
+check-task links: 87
+scan data ok
+  ▲ Next.js 16.x
+  - Local: http://localhost:3000
+```
+
+Test accounts: `alice@wg.local` (OWNER), `bob@wg.local`, `clara@wg.local`, `dave@wg.local` (no password required — dev auth).
+
+### CI-equivalent checks
+
+```bash
+# Rust/Vite
+make build-rs
+make build-fe
+
+# Webapp
+cd webapp
+npm install
+npx prisma generate
+npx prisma migrate dev
+npm run db:seed:scan
+npm run db:validate:scan
+npm run lint
+npm run build
+npm run smoke         # scan/deal/action loop
+npm run smoke:access  # household scoping
+npm run smoke:webapp  # notes, expenses, decisions
+```
+
+## Limitations
+
+- **Single-user baseline**: The Rust/Vite surface has no concept of users or sessions.
+- **No production auth**: The webapp uses an email-only credentials provider. No OAuth, no password, no SSO.
+- **No production deployment**: The webapp has not been deployed outside localhost. See [`docs/deployment/webapp.md`](docs/deployment/webapp.md).
+- **Prototype quality**: Both surfaces work for the people who built them, but neither is hardened.
+- **Windows rename semantics**: Atomic file writes on the local-vault baseline are Linux-only; Windows falls back to remove-then-rename.
+- **Test coverage**: Smoke tests cover the critical paths. No unit or E2E test framework is installed.
 
 ## Architecture
 
-- **Backend (Rust/Axum)**: A high-performance service that replays your `events.ndjson` to derive current task scores in sub-milliseconds.
-- **Frontend (React)**: A mobile-friendly, minimal UI designed for use while walking around your house.
-- **Data Contract**: Purely file-based. History (`events.ndjson`) is append-only. Definitions (`tasks.json`, `checks.json`) support writeback via the Library UI ÔÇö the backend uses SHA-256 hash preconditions and write-to-temp-then-rename with automatic `.backup-<ts>.json` snapshots to prevent data loss or concurrent-write conflicts. On Linux the rename is atomic; on Windows the target file is removed before the rename (best-effort safety, not a cross-platform atomic guarantee).
+- [`docs/architecture/housepage-editions.md`](docs/architecture/housepage-editions.md) — Coexistence and staged migration plan
+- [`docs/technical/process_overview.md`](docs/technical/process_overview.md) — Scan flow, scoring, dealing
+- [`docs/technical/storage_behavior.md`](docs/technical/storage_behavior.md) — File-based storage contract
+- [`docs/runbooks/local-development.md`](docs/runbooks/local-development.md) — Local setup and troubleshooting
 
 ---
 

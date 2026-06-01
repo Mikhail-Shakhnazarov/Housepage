@@ -1,38 +1,42 @@
-# Housepage Architecture Decision: Editions and Migration
+# Housepage Architecture: Editions and Migration
 
-## 0. Context
+## Context
 
-Housepage currently exists in two disparate states:
-1. **Original Scan-First Prototype**: Rust/Axum backend, Vite/React frontend, local-first storage (JSON in Obsidian vault). Focuses on the "dealt hand" ritual.
-2. **WG Coordination Webapp**: Next.js surface, hosted Postgres, Auth.js. Focuses on social coordination (Notes, Expenses, Decisions).
+Housepage exists in two states:
 
-## 1. The Conflict
+1. **Local-vault baseline** (Rust/Axum backend, Vite/React frontend): local-first storage (JSON in Obsidian vault), built around the scan-first "dealt hand" ritual.
+2. **WG webapp** (Next.js/Prisma/Postgres): multi-user coordination with notes, expenses, decisions, and scan persistence.
 
-The `webapp` provides the social domain required for Berlin WG coordination but risks becoming a generic task tracker. The original prototype has the "magic" ritual (scan-first, energy/time-based dealing) but is tied to a local file system.
+## Current state (Phase 1: Coexistence)
 
-## 2. Decision: Staged Migration
+Both surfaces run independently. The local-vault baseline is the authoritative source of the scan-first ritual. The webapp operates as a hosted coordination shell with its own copy of the scan ontology seeded from the sample vault.
 
-We will pursue **Staged Migration** to converge these two paths without losing the product's soul.
+What has been ported to the webapp:
+- Scan ontology schema (rooms, checks, tasks, scan sessions, deals, task actions) in Postgres
+- Seed scripts that populate webapp data from `vault_sample/chore_system/`
+- Dealing logic ported as a TypeScript score-and-select function
+- Dashboard with scan loop UI (room picker, prompts, energy/time, dealt hand)
 
-### Phase 1: Coexistence (Current State)
-- The `webapp` operates as a hosted coordination shell.
-- The orignal prototype remains the source of truth for the scan-first ritual.
+What remains in the local-vault baseline only:
+- The original Rust dealing engine with full event-replay scoring
+- File-based storage with Obsidian integration
+- Hash-precondition writeback for definitions
 
-### Phase 2: Kernel Porting
-- The `webapp` will absorb the scan-first ontology (Rooms, Checks, ScanSessions, TaskActions).
-- The "Dealing" logic will be ported from Rust to TypeScript (or integrated via an edge-compatible WASM bridge).
-- The `webapp` dashboard will be re-centered around the scan ritual.
+## Migration plan
+
+### Phase 2: Kernel porting
+- Complete the dealing logic parity between Rust and TypeScript
+- Add a "Sovereignty Bridge" for one-directional export from webapp to local JSON/NDJSON format
+- Recenter webapp dashboard around scan ritual as primary action
 
 ### Phase 3: Retirement
-- Once the `webapp` matches the functional parity of the local prototype, the original Vite frontend can be retired.
-- A "Sovereignty Bridge" will be added to allow WG households to export their state back to the local Obsidian/JSON format.
+- Once webapp matches local-vault functional parity, retire the original Vite frontend
+- Keep the Rust backend available as an optional compute engine
+- Export bridge becomes bidirectional
 
-## 3. Rationale
+## What not to assume yet
 
-- **Preserve Ritual**: The scan-first loop is Housepage's unique valueproposition.
-- **Social Scalability**: Next.js/Postgres handles the concurrent multi-user state required for WG life better than local vault syncing.
-- **Optionality**: Staged migration allows us to iterate on the WG shell while keeping the core logic safe in the existing Rust backend.
-
-## 4. Immediate Action
-
-Demote the current "generic chore list" in `webapp` to a "Library" or "Backlog" view. The main dashboard must be re-architected to prompt for a Room Scan.
+- The two scan ontologies are not synced. Changes in the vault do not propagate to the webapp and vice versa.
+- The dealing logic in TypeScript is a simplified version of the Rust scoring engine. It does not include the full event-replay derivation.
+- The Sovereignty Bridge does not exist yet. Data in the webapp cannot be exported to the local vault format without a manual migration script.
+- The local-vault baseline is not deprecated and will not be retired until functional parity is demonstrated in production use.

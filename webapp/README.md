@@ -1,6 +1,10 @@
 # webapp — WG Coordination Surface
 
-Multi-user WG coordination (Notes, Expenses, Decisions) built on Next.js, Prisma, and Postgres.
+A multi-user household coordination workspace built on Next.js, Prisma, and Postgres. Designed for WG (flat-share) groups that need shared notes, expenses, decisions, and scan-first chore management.
+
+## Problem
+
+Group chat buries decisions, expense splits get forgotten, and chore rotas exist only in someone's head. The webapp gives a household a shared surface for the coordination work that a single-user scan loop cannot solve.
 
 ## Stack
 
@@ -10,27 +14,26 @@ Multi-user WG coordination (Notes, Expenses, Decisions) built on Next.js, Prisma
 - TypeScript
 - Tailwind CSS v4
 
-## Relationship to Local-Vault Baseline
+## Relationship to the local-vault baseline
 
-The `webapp/` surface is an exploration of multi-user WG coordination built on a hosted Postgres database. It is separate from the local-vault scan-first ritual in the Rust/Vite baseline.
+The webapp is a separate surface that adds multi-user coordination on top of a hosted Postgres database. The Rust/Vite local-vault baseline remains the authoritative source of the scan-first ritual. The webapp has its own copy of the scan ontology (rooms, checks, tasks) seeded from the sample vault.
 
 See [`docs/architecture/housepage-editions.md`](../docs/architecture/housepage-editions.md) for the staged migration strategy.
 
 ## Prerequisites
 
 - Node.js >= 18
-- PostgreSQL running locally with a `housepage` database
+- PostgreSQL running locally
 
 ### Postgres setup
 
 ```bash
-# Create the database user and database (adjust to your local setup)
 psql -U postgres -c "CREATE USER housepage WITH PASSWORD 'housepage';"
 psql -U postgres -c "CREATE DATABASE housepage OWNER housepage;"
 psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE housepage TO housepage;"
 ```
 
-## Local Setup
+## Complete first-run path
 
 ```bash
 cd webapp
@@ -38,54 +41,75 @@ cd webapp
 # 1. Install dependencies
 npm install
 
-# 2. Create .env from example
+# 2. Environment
 cp .env.example .env
-# Edit .env if your Postgres credentials differ
+# Edit .env if your Postgres credentials differ from the defaults
 
-# 3. Generate Prisma client and run migrations
+# 3. Generate Prisma client and apply migrations
 npx prisma generate
 npx prisma migrate dev
 
-# 4. Start dev server
-npm run dev
-```
+# 4. Seed base data (users, household, tasks, expenses, notes, decisions, feed)
+npm run seed
+# Expected output:
+#   Users: Alice, Bob, Clara, Dave
+#   Household: Sonnenallee 42
+#   Memberships: Alice (OWNER), Bob (MEMBER), Clara (MEMBER), Dave (SUBLET)
+#   Tasks: 6 created
+#   Expenses: 4 created with splits
+#   Notes: 4 created
+#   Decisions: 2 created
+#   Feed events: 7 created
+#   Seed complete.
 
-Open [http://localhost:3000](http://localhost:3000), sign in with any email, create a household, and the dashboard will load.
-
-### Scan Ontology Setup
-
-The webapp's scan ontology (rooms, checks, tasks, deal records) is populated from the local sample vault:
-
-```bash
-# Run migration first (creates scan ontology tables)
-npx prisma migrate dev --name scan_ontology
-
-# Seed scan definitions from vault_sample/chore_system
+# 5. Seed scan ontology from local sample vault
 npm run db:seed:scan
+# Expected output:
+#   === Scan Sample Seed ===
+#   Read 10 rooms, 120 tasks, 42 checks, 73 events
+#   User: alice@wg.local
+#   Household: Sonnenallee 42 (seed-sonnenallee-42)
+#   Rooms: 10 upserted
+#   Tasks: 120 upserted
+#   Checks: 42 upserted
+#   Check-task links: 87 upserted
+#   Historical events imported:
+#     Scan sessions: N
+#     Scan answers:  M
+#     Deals:         K
+#     Task actions:  J
+#   === Seed complete ===
 
-# Validate seeded data
+# 6. Validate seeded scan data
 npm run db:validate:scan
+# Expected output:
+#   rooms: 10
+#   checks: 42
+#   tasks: 120
+#   check-task links: 87
+#   scan data ok
+
+# 7. Start dev server
+npm run dev
+# Expected output:
+#   ▲ Next.js 16.x
+#   - Local: http://localhost:3000
 ```
 
-Expected validation output:
-```
-rooms: 10
-checks: 42
-tasks: 120
-check-task links: 87
-scan data ok
-```
+Open http://localhost:3000, sign in with any email (dev auth), create a household, and the dashboard loads.
 
-After running `npm run seed`, the following test accounts are available:
+### Test accounts (after seed)
 
-| Email | Role |
-|-------|------|
-| `alice@wg.local` | OWNER |
-| `bob@wg.local` | MEMBER |
-| `clara@wg.local` | MEMBER |
-| `dave@wg.local` | SUBLET |
+| Email | Role | Notes |
+|-------|------|-------|
+| `alice@wg.local` | OWNER | Household creator |
+| `bob@wg.local` | MEMBER | Standard member |
+| `clara@wg.local` | MEMBER | Standard member |
+| `dave@wg.local` | SUBLET | Limited role |
 
-## Available Scripts
+No password required. Auth is email-only for development.
+
+## Available scripts
 
 | Command | Description |
 |---------|-------------|
@@ -93,26 +117,66 @@ After running `npm run seed`, the following test accounts are available:
 | `npm run build` | Production build |
 | `npm start` | Start production server |
 | `npm run lint` | Run ESLint |
-| `npm run smoke` | Run local smoke test (Prisma connectivity and basic CRUD) |
+| `npm run smoke` | Scan/deal/action lifecycle smoke test |
+| `npm run smoke:scan` | Alias for `smoke` |
+| `npm run smoke:access` | Household scoping and role enforcement smoke test |
+| `npm run smoke:webapp` | Notes, expenses, decisions smoke test |
+| `npm run seed` | Seed base data (users, household, tasks, expenses, notes, decisions) |
 | `npm run db:generate` | Generate Prisma client |
 | `npm run db:migrate` | Run Prisma migrations in dev mode |
-| `npm run db:seed:scan` | Seed scan ontology from local sample vault (rooms, tasks, checks, links) |
-| `npm run db:validate:scan` | Validate scan data integrity for the seed household |
+| `npm run db:seed:scan` | Seed scan ontology from local sample vault |
+| `npm run db:validate:scan` | Validate scan data integrity for seed household |
 
-## Development Auth
+## Development auth
 
-Authentication uses a credentials provider (email-only). No password or OAuth is required. Enter any email to sign in — a user account is created if one does not exist.
+Auth.js v5 with a credentials provider (email-only, no password). Enter any email to sign in — a user account is created if one does not exist. Sessions use a JWT strategy with `user.id` attached.
 
-This is suitable for local development only. Production auth is not implemented.
+**Not suitable for production.** No OAuth, no password verification, no SSO.
 
 ## Architecture
 
 - **Auth**: Auth.js v5 with Prisma adapter. Session includes `user.id`.
-- **Data model**: Multi-tenant via `Household` and `Membership`. All operational objects (tasks, expenses, notes, decisions, feed events) are scoped to a household.
-- **Scan ontology**: The webapp now stores scan-first objects — rooms, checks, scan sessions, scan answers, deals, deal tasks, and task actions — in Postgres per household. Definitions (rooms, checks, tasks with `sourceKey`) are seeded from the local sample vault.
-- **API**: App Router route handlers with membership checks via `requireHouseholdMember()`.
+- **Data model**: Multi-tenant via `Household` and `Membership`. All operational objects scoped to a household.
+- **Scan ontology**: Rooms, checks, scan sessions, deals, and task actions stored in Postgres per household. Definitions seeded from `vault_sample/chore_system/`.
+- **API**: App Router route handlers with membership checks via `requireHouseholdMember()` and `requireHouseholdOwner()`.
 - **State**: Client-side `HouseholdProvider` manages active household selection, persisted in localStorage.
 
-## Known Issues
+## Database commands
 
-- npm run lint may report non-blocking style warnings. These are being addressed incrementally.
+```bash
+# Reset database
+npx prisma migrate reset
+
+# Apply migrations only
+npx prisma migrate deploy
+
+# Create a new migration after schema changes
+npx prisma migrate dev --name describe_change
+
+# Open Prisma Studio
+npx prisma studio
+```
+
+## Common errors
+
+| Error | Likely cause |
+|-------|-------------|
+| `Can't reach database server` | Postgres not running or `DATABASE_URL` is wrong |
+| `Relation "public.User" does not exist` | Migrations not applied — run `npx prisma migrate dev` |
+| `Invalid prisma.user.upsert()` | Environment variables not loaded — ensure `.env` exists |
+| `npm run lint` reports style warnings | Non-blocking; being addressed incrementally |
+
+## Known limitations
+
+- Auth is email-only with no password. Not suitable for production.
+- No E2E browser tests. The app is exercised through direct Prisma smoke scripts.
+- No deployment to any staging or production environment. See `docs/deployment/webapp.md`.
+- Lint reports non-blocking style warnings from the Tailwind v4 migration.
+- The webapp and local-vault baseline have parallel scan ontologies with no sync bridge yet.
+
+## Status
+
+- Auth: Development-only credentials provider
+- Deployment: Not yet deployed outside localhost
+- CI: Postgres-backed build, migration, seed, validation, and smoke tests run in CI
+- Tests: Smoke scripts cover critical paths (scan, deal, action, access control, notes, expenses, decisions)

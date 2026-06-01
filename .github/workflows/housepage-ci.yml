@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - work/repo-boundary
+      - work/webapp-evidence-docs-deploy
   pull_request:
   workflow_dispatch:
 
@@ -244,8 +245,8 @@ jobs:
           name: housepage-backend-log
           path: /tmp/housepage-backend.log
 
-  webapp-informational:
-    name: Webapp informational lint
+  webapp-lint:
+    name: Webapp lint
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -274,10 +275,8 @@ jobs:
       - name: Summarize webapp status
         if: always()
         run: |
-          echo "## Webapp informational status" >> "$GITHUB_STEP_SUMMARY"
-          echo "The webapp is classified as a future surface and is not a gate for the Rust/Vite baseline." >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Lint exit status is informational in this workflow." >> "$GITHUB_STEP_SUMMARY"
+          echo "## Webapp lint" >> "$GITHUB_STEP_SUMMARY"
+          echo "Lint runs as a non-blocking gate. Full webapp validation with Postgres is in the webapp-db-build job." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload webapp lint log
         if: always()
@@ -286,10 +285,10 @@ jobs:
           name: webapp-lint-log
           path: webapp-lint.log
 
-  webapp-scan-ontology:
-    name: Webapp scan ontology
+  webapp-db-build:
+    name: Webapp DB / build
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     services:
       postgres:
@@ -333,7 +332,7 @@ jobs:
         working-directory: webapp
 
       - name: Run migration
-        run: npx prisma migrate dev --name scan_ontology
+        run: npx prisma migrate deploy
         working-directory: webapp
 
       - name: Seed base data
@@ -348,6 +347,18 @@ jobs:
         run: npm run db:validate:scan
         working-directory: webapp
 
-      - name: API smoke test (scan/deal/action loop)
+      - name: Smoke test (scan/deal/action loop)
         run: npm run smoke
+        working-directory: webapp
+
+      - name: Smoke test (access control)
+        run: npm run smoke:access
+        working-directory: webapp
+
+      - name: Smoke test (webapp - notes, expenses, decisions)
+        run: npm run smoke:webapp
+        working-directory: webapp
+
+      - name: Build webapp
+        run: npm run build
         working-directory: webapp
