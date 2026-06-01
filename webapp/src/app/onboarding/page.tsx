@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Home, Plus, ArrowRight } from 'lucide-react';
+import { Home, ArrowRight } from 'lucide-react';
 
 export default function Onboarding() {
     const [name, setName] = useState('');
@@ -46,7 +46,7 @@ export default function Onboarding() {
                         <Home size={40} />
                     </div>
                     <h1 className="text-4xl font-extrabold tracking-tight text-foreground mb-2">Welcome to Housepage</h1>
-                    <p className="text-foreground opacity-60">Let's set up your WG coordination space.</p>
+                    <p className="text-foreground opacity-60">Let&apos;s set up your WG coordination space.</p>
                 </div>
 
                 <div className="glass-card p-8 rounded-3xl space-y-6">
@@ -91,7 +91,7 @@ export default function Onboarding() {
                 </div>
 
                 <p className="text-center text-xs opacity-50 px-8">
-                    By creating a household, you become the admin and can invite your flatmates.
+                    By creating a household, you become the owner and can invite your flatmates.
                 </p>
             </motion.div>
         </div>
