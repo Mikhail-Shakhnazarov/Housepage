@@ -252,6 +252,90 @@
       "room": "bedroom",
       "prompt": "Is there dry laundry on the rack?",
       "linked_task_ids": ["t_laundry_take_down_laundry", "t_laundry_fold_by_person", "t_laundry_put_away_laundry"]
+    },
+    {
+      "id": "c_kitchen_fridge_empty",
+      "room": "kitchen",
+      "prompt": "Is the fridge empty?",
+      "linked_task_ids": ["t_kitchen_throw_away_rotten_food"]
+    },
+    {
+      "id": "c_kitchen_plastic_boxes_put_away",
+      "room": "kitchen",
+      "prompt": "Are the plastic boxes put away?",
+      "linked_task_ids": ["t_kitchen_put_away_dry_plastics"]
+    },
+    {
+      "id": "c_kitchen_stove_clean",
+      "room": "kitchen",
+      "prompt": "Is the stove clean?",
+      "linked_task_ids": ["t_kitchen_clean_stove"]
+    },
+    {
+      "id": "c_kitchen_countertops_clean",
+      "room": "kitchen",
+      "prompt": "Are the countertops clean?",
+      "linked_task_ids": []
+    },
+    {
+      "id": "c_kitchen_anything_left_out",
+      "room": "kitchen",
+      "prompt": "Is there anything left out?",
+      "linked_task_ids": ["t_kitchen_put_away_food"]
+    },
+    {
+      "id": "c_supermarket_cat_food_enough",
+      "room": "supermarket",
+      "prompt": "Do we have enough cat food?",
+      "linked_task_ids": ["t_shopping_add_cat_food"]
+    },
+    {
+      "id": "c_supermarket_cat_litter_enough",
+      "room": "supermarket",
+      "prompt": "Do we have enough cat litter?",
+      "linked_task_ids": ["t_shopping_add_cat_litter"]
+    },
+    {
+      "id": "c_supermarket_check_promos",
+      "room": "supermarket",
+      "prompt": "Are there promos to check?",
+      "linked_task_ids": []
+    },
+    {
+      "id": "c_garbage_full",
+      "room": "garbage",
+      "prompt": "Is the garbage full?",
+      "linked_task_ids": ["t_garbage_take_out"]
+    },
+    {
+      "id": "c_garbage_clean_bins",
+      "room": "garbage",
+      "prompt": "Do the bins need cleaning?",
+      "linked_task_ids": ["t_garbage_clean_bins"]
+    },
+    {
+      "id": "c_garbage_new_bags",
+      "room": "garbage",
+      "prompt": "Do we need new bags?",
+      "linked_task_ids": ["t_garbage_set_new_bags"]
+    },
+    {
+      "id": "c_garbage_paper_boxes",
+      "room": "garbage",
+      "prompt": "Are there paper boxes to take down?",
+      "linked_task_ids": ["t_garbage_take_down_paper_trash"]
+    },
+    {
+      "id": "c_garbage_plastic_to_bring_down",
+      "room": "garbage",
+      "prompt": "Is there plastic to bring down?",
+      "linked_task_ids": ["t_garbage_bring_down_plastic"]
+    },
+    {
+      "id": "c_garbage_bedrooms",
+      "room": "garbage",
+      "prompt": "Is there garbage in the bedrooms?",
+      "linked_task_ids": ["t_garbage_take_out_bedroom_garbage"]
     }
   ]
 }

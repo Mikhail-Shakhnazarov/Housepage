@@ -7,6 +7,7 @@
     { "id": "t_garbage_take_down_paper_trash", "title": "Take down paper bags / boxes", "room": "garbage", "effort": 3, "minutes_est": 15, "frequency_days": null, "kind": "tidy" },
     { "id": "t_garbage_take_out_bathroom_garbage", "title": "Take out bathroom garbage", "room": "garbage", "effort": 2, "minutes_est": 5, "frequency_days": null, "kind": "tidy" },
     { "id": "t_garbage_take_out_bedroom_garbage", "title": "Take out bedroom garbage", "room": "garbage", "effort": 2, "minutes_est": 5, "frequency_days": null, "kind": "tidy" },
+    { "id": "t_garbage_bring_down_plastic", "title": "Bring down plastic for recycling", "room": "garbage", "effort": 2, "minutes_est": 10, "frequency_days": null, "kind": "tidy" },
 
     { "id": "t_kitchen_empty_dishwasher", "title": "Empty the dishwasher", "room": "kitchen", "effort": 2, "minutes_est": 7, "frequency_days": null, "kind": "tidy" },
     { "id": "t_kitchen_run_dishwasher", "title": "Run the dishwasher", "room": "kitchen", "effort": 1, "minutes_est": 2, "frequency_days": null, "kind": "clean" },
