@@ -17,13 +17,27 @@ Locally executed checks reproduced the branch-authored ritual core and exercised
 - deterministic deal output for identical recorded state;
 - explicit `deal-v1` algorithm version in results.
 
-**Result:** PASS for the semantic slice.
+**Result:** PASS.
+
+## V-002 — Portable SQLite/event store
+
+Locally executed checks exercised:
+
+- explicit schema initialization;
+- room/check/task persistence;
+- append-ordered household events;
+- timezone-aware event round-trip;
+- complete bundle export into language-neutral structures;
+- replacement restore into a fresh database;
+- equality of definitions and events after round-trip.
+
+**Result:** PASS.
 
 ## Not yet validated
 
 - package installation from the GitHub branch itself (connector repository is not mounted into the sandbox);
-- event-stream serialization/replay;
-- persistence and migration;
+- migration from inherited vault/webapp stores;
+- definition revision history/hash-preconditions;
 - local household UI;
 - production household identity/isolation;
 - sustained situated use.
