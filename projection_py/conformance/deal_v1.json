@@ -1,0 +1,29 @@
+{
+  "_copyright": "© 2026 Mikhail Shakhnazarov. All rights reserved.",
+  "schema_version": "1",
+  "algorithm_version": "deal-v1",
+  "now": "2026-08-12T12:00:00+00:00",
+  "request": {
+    "room": "kitchen",
+    "energy": 5,
+    "time_min": 30,
+    "hand_size": 3
+  },
+  "tasks": [
+    {"id":"sink","title":"Clear the sink","room":"kitchen","kind":"clean","effort":2,"minutes_est":10,"frequency_days":1},
+    {"id":"floor","title":"Sweep floor","room":"kitchen","kind":"clean","effort":3,"minutes_est":15,"frequency_days":3},
+    {"id":"bins","title":"Take garbage out","room":"garbage","kind":"tidy","effort":2,"minutes_est":10,"frequency_days":2}
+  ],
+  "checks": [
+    {"id":"sink-clear","room":"kitchen","prompt":"Is the sink clear?","linked_task_ids":["sink"]},
+    {"id":"floor-clear","room":"kitchen","prompt":"Is the floor clear?","linked_task_ids":["floor"]}
+  ],
+  "events": [
+    {"type":"scan_answer","ts":"2026-08-12T11:00:00+00:00","room":"kitchen","task_id":null,"check_id":"floor-clear","answer":"no"}
+  ],
+  "expected_items": [
+    {"task_id":"floor","score":5.2875,"reason_codes":["overdue","scan","room"]},
+    {"task_id":"sink","score":2.85,"reason_codes":["overdue","room","comfort"]},
+    {"task_id":"bins","score":2.5,"reason_codes":["overdue","comfort"]}
+  ]
+}
