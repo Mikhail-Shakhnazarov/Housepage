@@ -39,14 +39,30 @@ class Task:
 class Event:
     type: str
     ts: datetime
+    event_id: str | None = None
+    session_id: str | None = None
+    device_id: str | None = None
+    client_ts: datetime | None = None
     room: str | None = None
     task_id: str | None = None
     check_id: str | None = None
     answer: Answer | None = None
+    energy: int | None = None
+    time_min: int | None = None
+    hand_size: int | None = None
+    task_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if self.ts.tzinfo is None:
             raise ValueError("event timestamps must be timezone-aware")
+        if self.client_ts is not None and self.client_ts.tzinfo is None:
+            raise ValueError("client timestamps must be timezone-aware")
+        if self.energy is not None and not 1 <= self.energy <= 5:
+            raise ValueError("event energy must be in 1..5")
+        if self.time_min is not None and not 1 <= self.time_min <= 480:
+            raise ValueError("event time_min must be in 1..480")
+        if self.hand_size is not None and not 1 <= self.hand_size <= 20:
+            raise ValueError("event hand_size must be in 1..20")
 
 
 @dataclass(frozen=True, slots=True)
