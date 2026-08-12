@@ -7,16 +7,24 @@ from housepage_projection.core import Answer, Check, DealRequest, Event, Task, d
 
 
 class ConformanceTests(unittest.TestCase):
-    def test_deal_v1_vector(self) -> None:
+    def test_deal_v2_vector(self) -> None:
         fixture = json.loads(
-            (Path(__file__).parents[1] / "conformance" / "deal_v1.json").read_text(
+            (Path(__file__).parents[1] / "conformance" / "deal_v2.json").read_text(
                 encoding="utf-8"
             )
         )
         request = DealRequest(**fixture["request"])
         tasks = tuple(Task(**item) for item in fixture["tasks"])
         checks = tuple(
-            Check(**{**item, "linked_task_ids": tuple(item["linked_task_ids"])})
+            Check(
+                id=item["id"],
+                room=item["room"],
+                prompt=item["prompt"],
+                linked_task_ids=tuple(item["linked_task_ids"]),
+                trigger_answer=Answer(item["trigger_answer"])
+                if item.get("trigger_answer") is not None
+                else None,
+            )
             for item in fixture["checks"]
         )
         events = tuple(
