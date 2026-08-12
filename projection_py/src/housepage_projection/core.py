@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from enum import StrEnum
-from typing import Iterable
+from typing import Iterable, Mapping
 
 
 class Answer(StrEnum):
@@ -22,6 +22,7 @@ class Check:
     room: str
     prompt: str
     linked_task_ids: tuple[str, ...]
+    trigger_answer: Answer = Answer.NO
 
 
 @dataclass(frozen=True, slots=True)
@@ -83,7 +84,7 @@ class DealRequest:
 
 @dataclass(frozen=True, slots=True)
 class Tunables:
-    version: str = "deal-v1"
+    version: str = "deal-v2"
     weight_overdue: float = 2.0
     weight_scan_boost: float = 3.0
     weight_room_bias: float = 0.35
@@ -146,7 +147,7 @@ def derive_task_signals(
     now: datetime,
     task_id: str,
     room_context: str,
-    linked_check_ids: frozenset[str],
+    linked_check_triggers: Mapping[str, Answer],
     events: Iterable[Event],
     tunables: Tunables,
 ) -> TaskSignals:
@@ -169,16 +170,12 @@ def derive_task_signals(
                 last_skip_ts = event.ts
             if event.ts >= skip_cutoff:
                 skip_count_recent += 1
-        elif (
-            event.type == "scan_answer"
-            and event.room == room_context
-            and event.answer == Answer.NO
-            and event.check_id in linked_check_ids
-            and event.ts >= scan_cutoff
-        ):
-            age_hours = (now - event.ts).total_seconds() / 3600.0
-            decay = max(1.0 - (age_hours / tunables.scan_boost_decay_hours), 0.0)
-            scan_boost += decay
+        elif event.type == "scan_answer" and event.room == room_context and event.check_id:
+            trigger = linked_check_triggers.get(event.check_id)
+            if trigger is not None and event.answer == trigger and event.ts >= scan_cutoff:
+                age_hours = (now - event.ts).total_seconds() / 3600.0
+                decay = max(1.0 - (age_hours / tunables.scan_boost_decay_hours), 0.0)
+                scan_boost += decay
 
     return TaskSignals(last_done_ts, last_skip_ts, skip_count_recent, scan_boost)
 
@@ -197,10 +194,10 @@ def deal_tasks(
         raise ValueError("now must be timezone-aware")
 
     event_list = tuple(events)
-    linked_checks_by_task: dict[str, set[str]] = {}
+    linked_checks_by_task: dict[str, dict[str, Answer]] = {}
     for check in checks:
         for task_id in check.linked_task_ids:
-            linked_checks_by_task.setdefault(task_id, set()).add(check.id)
+            linked_checks_by_task.setdefault(task_id, {})[check.id] = check.trigger_answer
 
     scored: list[DealItem] = []
     for task in tasks:
@@ -210,7 +207,7 @@ def deal_tasks(
             now=now,
             task_id=task.id,
             room_context=request.room,
-            linked_check_ids=frozenset(linked_checks_by_task.get(task.id, set())),
+            linked_check_triggers=linked_checks_by_task.get(task.id, {}),
             events=event_list,
             tunables=tunables,
         )
