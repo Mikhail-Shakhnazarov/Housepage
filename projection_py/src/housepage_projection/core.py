@@ -22,7 +22,7 @@ class Check:
     room: str
     prompt: str
     linked_task_ids: tuple[str, ...]
-    trigger_answer: Answer = Answer.NO
+    trigger_answer: Answer | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -147,7 +147,7 @@ def derive_task_signals(
     now: datetime,
     task_id: str,
     room_context: str,
-    linked_check_triggers: Mapping[str, Answer],
+    linked_check_triggers: Mapping[str, Answer | None],
     events: Iterable[Event],
     tunables: Tunables,
 ) -> TaskSignals:
@@ -194,7 +194,7 @@ def deal_tasks(
         raise ValueError("now must be timezone-aware")
 
     event_list = tuple(events)
-    linked_checks_by_task: dict[str, dict[str, Answer]] = {}
+    linked_checks_by_task: dict[str, dict[str, Answer | None]] = {}
     for check in checks:
         for task_id in check.linked_task_ids:
             linked_checks_by_task.setdefault(task_id, {})[check.id] = check.trigger_answer
